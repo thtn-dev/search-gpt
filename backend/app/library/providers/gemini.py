@@ -2,7 +2,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, H
 from pydantic import BaseModel
 from typing import Dict, List
 from langchain_core.language_models.chat_models import BaseChatModel
-from app.lib.config import get_gemini_api_key
+from app.library.config import get_gemini_api_key
 
 class ChatModel(BaseModel):
     displayName: str
