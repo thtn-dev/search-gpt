@@ -63,6 +63,7 @@ instance/
 # FastAPI specific
 .env
 .env.*
+!.env.example
 *.db
 
 # Scrapy stuff:
