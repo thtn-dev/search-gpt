@@ -66,6 +66,8 @@ instance/
 !.env.example
 *.db
 
+config.toml
+
 # Scrapy stuff:
 .scrapy
 

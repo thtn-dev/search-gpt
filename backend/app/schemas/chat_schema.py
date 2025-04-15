@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
 
-class ChatRequest (BaseModel):
+class ChatRequest2 (BaseModel):
     """
     Schema for AI chat request.
     """
     message: str
     
-class ChatResponse (BaseModel):
+class ChatResponse2 (BaseModel):
     """
     Schema for AI chat response.
     """

@@ -21,5 +21,5 @@ def load_config_tomllib():
 def get_gemini_api_key() -> str:
     """Get the Gemini API key from the config file."""
     config = load_config_tomllib()
-    return config["gemini"]["api_key"]
+    return config["MODELS"]["GEMINI"]["API_KEY"]
     
