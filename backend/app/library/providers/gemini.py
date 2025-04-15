@@ -44,7 +44,7 @@ def load_gemini_chat_models() -> Dict[str, ChatModel]:
         raise ValueError("Gemini API key must be a string.")
     
     try:
-        chat_models = Dict[str, BaseChatModel] = {}
+        chat_models : Dict[str, ChatModel] = {}
         
         for model in GEMINI_CHAT_MODELS.models:
             if model.key in chat_models:
@@ -58,6 +58,7 @@ def load_gemini_chat_models() -> Dict[str, ChatModel]:
                     temperature=0.7,
                 )
             )
+            
             chat_models[model.key] = chat_model
         return chat_models
     except Exception as e:
