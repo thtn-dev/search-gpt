@@ -13,7 +13,6 @@ import sqlmodel
 import sqlmodel.sql.sqltypes
 ${imports if imports else ""}
 
-
 # revision identifiers, used by Alembic.
 revision: str = ${repr(up_revision)}
 down_revision: Union[str, None] = ${repr(down_revision)}
