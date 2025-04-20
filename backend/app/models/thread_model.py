@@ -2,6 +2,7 @@ from __future__ import annotations
 from sqlmodel import Relationship, SQLModel, Field
 from typing import List, Optional
 from datetime import datetime, timezone
+from sqlalchemy.orm import Mapped, relationship
 
 class ThreadModel(SQLModel, table=True):
     __tablename__ = "threads"

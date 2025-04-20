@@ -1,6 +1,6 @@
 import asyncio
 import json
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from typing import Any
 from app.core.exceptions import gemini_exception_handler, GeminiAPIException
@@ -78,47 +78,58 @@ async def _stream_generator(messages: list, llm: BaseChatModel):
     Async generator để tạo ra các chunk phản hồi từ LLM.
     """
     if llm is None:
-        # Không thể raise HTTPException từ generator, nên cần cách xử lý khác
-        # Có thể yield một thông báo lỗi đặc biệt
-        yield f"data: {json.dumps({'error': 'LLM service is unavailable.'})}\n\n"
+        yield f"data: {json.dumps({'err': 'LLM service is unavailable.'})}\n\n"
         return
 
-    print("Starting stream generation...") # Logging
+    print("Starting stream generation...")
     try:
-        # Sử dụng astream để nhận các chunk phản hồi
         async for chunk in llm.astream(messages):
             if chunk.content:
-                # Định dạng theo Server-Sent Events (SSE)
-                # Mỗi chunk được gửi dưới dạng: "data: <json_string>\n\n"
+                # format: "data: <json_string>\n\n"
                 yield f"data: {json.dumps({'chk': chunk.content}, ensure_ascii=False)}\n\n"
-                # print(f"Sent chunk: {chunk.content}") # Logging (có thể tạo nhiều log)
-                await asyncio.sleep(0.01) # Thêm delay nhỏ để tránh quá tải client (tùy chọn)
-
-        # (Tùy chọn) Gửi một thông điệp kết thúc stream
-        yield f"data: {json.dumps({'eofs': True})}\n\n"
-        print("Stream generation finished.") # Logging
-
+                await asyncio.sleep(0.01)
     except Exception as e:
         error_message = f"Error during LLM streaming: {str(e)}"
-        print(error_message) # Logging
-        # Gửi thông báo lỗi qua stream
-        yield f"e: {json.dumps({'error': error_message})}\n\n"
+        print(error_message) 
+        yield f"event: {json.dumps({'err': error_message})}\n\n"
+    finally:
+        yield f"event: {json.dumps({'eofs': True})}\n\n"
+        print("Stream generation finished.")
 
-@router.post("/chat2/stream")
+@router.post("/chat2/stream",
+            summary="Process a chat message with streaming",
+            description="Receives a user message and conversation history, streams the AI's reply chunk by chunk using Server-Sent Events (SSE).",
+            tags=["Chat (Streaming)"])
 async def chat_stream_endpoint(request: ChatRequest2):
     """
-    Nhận tin nhắn từ client và trả về phản hồi dạng luồng (streaming) từ Gemini.
+    Handles incoming chat requests and streams the response.
     """
     print(f"Received message for /chat/stream: {request.message}") # Logging
     models = load_gemini_chat_models()
     llm = models.get("gemini-2.0-flash")
     if not llm:
-        raise HTTPException(status_code=503, detail="LLM service is unavailable.")
-    # --- Chuẩn bị prompt (tương tự /chat) ---
-    messages = [
-        HumanMessage(content=request.message)
-    ]
-
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="LLM model is not available due to initialization error."
+        )
+    # --- Prepare messages for Langchain ---
+    messages = []
+    if request.systemInstructions:
+        messages.append(SystemMessage(content=request.systemInstructions))
+        print(f"   Added System Message: {request.systemInstructions}")
+    else:
+        print("   No System Message provided.")
+    
+    for i, msg_content in enumerate(request.history):
+        if i % 2 == 0: # Even index = User message (assuming history starts with user)
+            messages.append(HumanMessage(content=msg_content))
+            print(f"   Added History (Human): {msg_content}")
+        else: # Odd index = AI message
+            messages.append(AIMessage(content=msg_content))
+            print(f"   Added History (AI): {msg_content}")
+            
+    messages.append(HumanMessage(content=request.message))
+    print(f"   Added Current User Message: {request.message}")        
     # Trả về StreamingResponse với generator và media type phù hợp cho SSE
     return StreamingResponse(
         _stream_generator(messages, llm.model),
