@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from app.config.settings import settings
 
-DATABASE_URL = settings.DATABASE_URL
-
+DATABASE_URL = "postgresql+asyncpg://neondb_owner:npg_pM3Ymyzk0GbU@ep-odd-sunset-a1i98n8z-pooler.ap-southeast-1.aws.neon.tech/neondb"
+print(f"Connecting to database at {DATABASE_URL}")
 engine = create_async_engine(
     DATABASE_URL,
     echo=True,
@@ -31,4 +31,11 @@ sync_engine = create_engine(
 # Create a synchronous session generator
 def get_session() -> Generator[Session, None, None]:
     with Session(engine) as session:
+        yield session
+
+async def get_session2() -> AsyncSession: # type: ignore
+    async_session = sessionmaker(
+        bind=engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
         yield session

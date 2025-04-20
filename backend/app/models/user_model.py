@@ -1,6 +1,7 @@
 from __future__ import annotations
+from sqlalchemy.orm import Mapped, relationship
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime, timezone
 
 class UserModel(SQLModel, table=True):
@@ -10,7 +11,6 @@ class UserModel(SQLModel, table=True):
     email: str = Field(unique=True, index=True)
     hashed_password: str
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default=datetime.now())
+    updated_at: datetime = Field(default=datetime.now())
     
-    threads: List["ThreadModel"] = Relationship(back_populates="user") # type: ignore

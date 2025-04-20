@@ -54,6 +54,7 @@ def load_gemini_chat_models() -> Dict[str, ChatModel]:
                 displayName=model.displayName,
                 model=ChatGoogleGenerativeAI(
                     api_key=geminiApiKey,
+                    convert_system_message_to_human=True,
                     model=model.key,
                     temperature=0.7,
                 )

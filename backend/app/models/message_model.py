@@ -1,7 +1,8 @@
 from __future__ import annotations
 from sqlmodel import Relationship, SQLModel, Field
-from typing import List, Optional
+from typing import Optional
 from datetime import datetime, timezone
+from sqlalchemy.orm import Mapped, relationship
 
 class MessageModel(SQLModel, table=True):
     __tablename__ = "messages"
