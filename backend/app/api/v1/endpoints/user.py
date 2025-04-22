@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
+from app.core.security import get_password_hash
 from app.database.session import get_session2
 from app.models.user_model import UserModel
 from app.schemas.user.create_user_schema import UserCreate, UserRead
@@ -36,7 +37,7 @@ async def create_new_user(
             )
 
     # Băm mật khẩu trước khi lưu
-    hashed_password = hash_password(user_in.password)
+    hashed_password = get_password_hash(user_in.password)
 
     # Tạo đối tượng UserModel từ dữ liệu đầu vào và mật khẩu đã băm
     # Loại bỏ password khỏi user_in dict trước khi truyền vào UserModel

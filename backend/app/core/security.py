@@ -5,7 +5,7 @@ import bcrypt
 import jwt
 from cryptography.fernet import Fernet
 
-from app.config import settings
+from app.config.settings import  settings
 
 fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
 

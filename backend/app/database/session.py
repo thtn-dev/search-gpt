@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from app.config.settings import settings
 
 DATABASE_URL = settings.DATABASE_URL
-print(f"Connecting to database at {DATABASE_URL}")
 engine = create_async_engine(
     DATABASE_URL,
     echo=True,
