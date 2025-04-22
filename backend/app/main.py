@@ -1,9 +1,16 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from app.api.v1.router import api_router_v1
+from app.config.logging_config import setup_logging
+setup_logging()
+
+logger = logging.getLogger(__name__)
+
 
 def create_application() -> FastAPI:
+    logger.info("Starting...")
     """Create and configure the FastAPI application."""
     application = FastAPI(
         title="Search API",
