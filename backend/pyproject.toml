@@ -6,7 +6,7 @@ authors = [
     {name = "thtn-dev",email = "thtn.1611.dev@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13,<4.0"
+requires-python = ">=3.12,<4.0"
 dependencies = [
     "fastapi (>=0.115.12,<0.116.0)",
     "uvicorn[standard] (>=0.34.2,<0.35.0)",
@@ -31,3 +31,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 start = "uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
+
+[tool.poetry]
+package-mode = false
