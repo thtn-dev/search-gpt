@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import {  Montserrat, Noto_Sans_Mono } from "next/font/google";
-import "./globals.css";
+import "@/styles/globals.css";
+import { AuthProvider } from "@/providers/auth-provider";
 
 const MontserratFont = Montserrat({
   variable: "--font-montserrat",
@@ -29,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${MontserratFont.className} ${NotoSansMono.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

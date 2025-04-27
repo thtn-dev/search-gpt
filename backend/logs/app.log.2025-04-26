@@ -1,0 +1,555 @@
+2025-04-26 23:34:14 - app.main - INFO - Starting...
+2025-04-26 23:34:14 - uvicorn.error - INFO - Started server process [10900]
+2025-04-26 23:34:14 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:34:14 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:34:32 - uvicorn.access - INFO - 127.0.0.1:55563 - "GET / HTTP/1.1" 200
+2025-04-26 23:34:33 - uvicorn.access - INFO - 127.0.0.1:55563 - "GET /favicon.ico HTTP/1.1" 404
+2025-04-26 23:34:36 - uvicorn.access - INFO - 127.0.0.1:55563 - "GET /docs HTTP/1.1" 200
+2025-04-26 23:34:37 - uvicorn.access - INFO - 127.0.0.1:55563 - "GET /openapi.json HTTP/1.1" 200
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR OR users.email = $2::VARCHAR
+2025-04-26 23:35:15 - sqlalchemy.engine.Engine - INFO - [generated in 0.00090s] ('trungnam', 'thtn.1611.dev@gmail.com')
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - INSERT INTO users (username, email, hashed_password, is_active, created_at, updated_at) VALUES ($1::VARCHAR, $2::VARCHAR, $3::VARCHAR, $4::BOOLEAN, $5::TIMESTAMP WITHOUT TIME ZONE, $6::TIMESTAMP WITHOUT TIME ZONE) RETURNING users.id
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - [generated in 0.00083s] ('trungnam', 'thtn.1611.dev@gmail.com', '$2b$12$ToKZy2Oc7fwkILHNZyLzxOcGnMV3hofX.wLZlRQiA2UA4GAjYCB8G', True, datetime.datetime(2025, 4, 26, 16, 35, 16, 306333), datetime.datetime(2025, 4, 26, 16, 35, 16, 306463))
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - COMMIT
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.id = $1::INTEGER
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - [generated in 0.00072s] (19,)
+2025-04-26 23:35:16 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:35:16 - uvicorn.access - INFO - 127.0.0.1:55564 - "POST /api/v1/users/ HTTP/1.1" 201
+2025-04-26 23:35:42 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:35:42 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:35:42 - sqlalchemy.engine.Engine - INFO - [generated in 0.00808s] ('trungnam',)
+2025-04-26 23:35:42 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:35:42 - uvicorn.access - INFO - 127.0.0.1:55570 - "POST /api/v1/users/login HTTP/1.1" 500
+2025-04-26 23:35:42 - uvicorn.error - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\app\api\v1\endpoints\user.py", line 104, in login_user
+    if not db_user.verify_password(user_in.password):
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\pydantic\main.py", line 994, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'UserModel' object has no attribute 'verify_password'
+2025-04-26 23:36:12 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:36:12 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-26 23:36:12 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-26 23:36:12 - uvicorn.error - INFO - Finished server process [10900]
+2025-04-26 23:36:17 - app.main - INFO - Starting...
+2025-04-26 23:36:17 - uvicorn.error - INFO - Started server process [10456]
+2025-04-26 23:36:17 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:36:17 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:36:17 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:36:17 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - [generated in 0.00078s] ('trungnam',)
+2025-04-26 23:36:18 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:36:18 - uvicorn.access - INFO - 127.0.0.1:55578 - "POST /api/v1/users/login HTTP/1.1" 500
+2025-04-26 23:36:18 - uvicorn.error - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\app\api\v1\endpoints\user.py", line 104, in login_user
+    if not verify_password(user_in.password):
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+TypeError: verify_password() missing 1 required positional argument: 'hashed_password'
+2025-04-26 23:36:33 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:36:33 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-26 23:36:33 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-26 23:36:33 - uvicorn.error - INFO - Finished server process [10456]
+2025-04-26 23:36:39 - app.main - INFO - Starting...
+2025-04-26 23:36:39 - uvicorn.error - INFO - Started server process [18624]
+2025-04-26 23:36:39 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:36:39 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:36:41 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:36:41 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:36:41 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:36:41 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:36:41 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:36:41 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:36:42 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:36:42 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:36:42 - sqlalchemy.engine.Engine - INFO - [generated in 0.00091s] ('trungnam',)
+2025-04-26 23:36:42 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:36:42 - uvicorn.access - INFO - 127.0.0.1:55593 - "POST /api/v1/users/login HTTP/1.1" 500
+2025-04-26 23:36:42 - uvicorn.error - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\app\api\v1\endpoints\user.py", line 110, in login_user
+    access_token = create_access_token(subject=db_user.id)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\app\core\security.py", line 24, in create_access_token
+    return jwt.encode(
+           ^^^^^^^^^^
+AttributeError: module 'jwt' has no attribute 'encode'
+2025-04-26 23:37:18 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:37:18 - uvicorn.error - INFO - Finished server process [18624]
+2025-04-26 23:37:18 - uvicorn.error - ERROR - Traceback (most recent call last):
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 712, in run_until_complete
+    self.run_forever()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 683, in run_forever
+    self._run_once()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 2040, in _run_once
+    handle._run()
+    ~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\server.py", line 69, in serve
+    with self.capture_signals():
+         ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 148, in __exit__
+    next(self.gen)
+    ~~~~^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\server.py", line 330, in capture_signals
+    signal.raise_signal(captured_signal)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 699, in lifespan
+    await receive()
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\lifespan\on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\queues.py", line 186, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+2025-04-26 23:47:15 - app.main - INFO - Starting...
+2025-04-26 23:47:15 - uvicorn.error - INFO - Started server process [14980]
+2025-04-26 23:47:15 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:47:15 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - [generated in 0.00097s] ('trungnam',)
+2025-04-26 23:47:19 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:47:19 - uvicorn.access - INFO - 127.0.0.1:55854 - "POST /api/v1/users/login HTTP/1.1" 500
+2025-04-26 23:47:19 - uvicorn.error - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 301, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 212, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\app\api\v1\endpoints\user.py", line 110, in login_user
+    access_token = create_access_token(subject=db_user.id)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\app\core\security.py", line 23, in create_access_token
+    return jwt.encode(
+           ^^^^^^^^^^
+AttributeError: module 'jwt' has no attribute 'encode'
+2025-04-26 23:48:26 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:48:26 - uvicorn.error - INFO - Finished server process [14980]
+2025-04-26 23:48:26 - uvicorn.error - ERROR - Traceback (most recent call last):
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ~~~~~~~~~~^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 712, in run_until_complete
+    self.run_forever()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 683, in run_forever
+    self._run_once()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\base_events.py", line 2040, in _run_once
+    handle._run()
+    ~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\events.py", line 89, in _run
+    self._context.run(self._callback, *self._args)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\server.py", line 69, in serve
+    with self.capture_signals():
+         ~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\contextlib.py", line 148, in __exit__
+    next(self.gen)
+    ~~~~^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\server.py", line 330, in capture_signals
+    signal.raise_signal(captured_signal)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\runners.py", line 157, in _on_sigint
+    raise KeyboardInterrupt()
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 699, in lifespan
+    await receive()
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\lifespan\on.py", line 137, in receive
+    return await self.receive_queue.get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\AppData\Local\Programs\Python\Python313\Lib\asyncio\queues.py", line 186, in get
+    await getter
+asyncio.exceptions.CancelledError
+
+2025-04-26 23:50:02 - app.main - INFO - Starting...
+2025-04-26 23:50:02 - uvicorn.error - INFO - Started server process [32408]
+2025-04-26 23:50:02 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:50:02 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:50:03 - sqlalchemy.engine.Engine - INFO - [generated in 0.00094s] ('trungnam',)
+2025-04-26 23:50:04 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:50:04 - uvicorn.access - INFO - 127.0.0.1:55906 - "POST /api/v1/users/login HTTP/1.1" 500
+2025-04-26 23:50:04 - uvicorn.error - ERROR - Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\protocols\http\httptools_impl.py", line 409, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\applications.py", line 1054, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\applications.py", line 112, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 187, in __call__
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\errors.py", line 165, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 714, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 734, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 327, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+    )
+    ^
+  File "C:\Users\trung\Desktop\search\search-gpt\backend\.venv\Lib\site-packages\fastapi\routing.py", line 176, in serialize_response
+    raise ResponseValidationError(
+        errors=_normalize_errors(errors), body=response_content
+    )
+fastapi.exceptions.ResponseValidationError: 2 validation errors:
+  {'type': 'missing', 'loc': ('response', 'username'), 'msg': 'Field required', 'input': {'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDU2ODgwMDQsInN1YiI6IjE5IiwidHlwZSI6ImFjY2VzcyJ9.I6vwERiz8-sUIcglBS0MKZuX_Hz4qgWBqw_ztgBGOMI', 'token_type': 'Bearer', 'user': UserModel(email='thtn.1611.dev@gmail.com', hashed_password='$2b$12$ToKZy2Oc7fwkILHNZyLzxOcGnMV3hofX.wLZlRQiA2UA4GAjYCB8G', created_at=datetime.datetime(2025, 4, 26, 16, 35, 16, 306333), id=19, is_active=True, username='trungnam', updated_at=datetime.datetime(2025, 4, 26, 16, 35, 16, 306463))}}
+  {'type': 'missing', 'loc': ('response', 'password'), 'msg': 'Field required', 'input': {'access_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDU2ODgwMDQsInN1YiI6IjE5IiwidHlwZSI6ImFjY2VzcyJ9.I6vwERiz8-sUIcglBS0MKZuX_Hz4qgWBqw_ztgBGOMI', 'token_type': 'Bearer', 'user': UserModel(email='thtn.1611.dev@gmail.com', hashed_password='$2b$12$ToKZy2Oc7fwkILHNZyLzxOcGnMV3hofX.wLZlRQiA2UA4GAjYCB8G', created_at=datetime.datetime(2025, 4, 26, 16, 35, 16, 306333), id=19, is_active=True, username='trungnam', updated_at=datetime.datetime(2025, 4, 26, 16, 35, 16, 306463))}}
+
+2025-04-26 23:50:35 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:50:35 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-26 23:50:35 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-26 23:50:35 - uvicorn.error - INFO - Finished server process [32408]
+2025-04-26 23:50:40 - app.main - INFO - Starting...
+2025-04-26 23:50:40 - uvicorn.error - INFO - Started server process [7732]
+2025-04-26 23:50:40 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:50:40 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - [generated in 0.00137s] ('trungnam',)
+2025-04-26 23:50:41 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:50:41 - uvicorn.access - INFO - 127.0.0.1:55913 - "POST /api/v1/users/login HTTP/1.1" 200
+2025-04-26 23:53:20 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:53:20 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-26 23:53:20 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-26 23:53:20 - uvicorn.error - INFO - Finished server process [7732]
+2025-04-26 23:53:26 - app.main - INFO - Starting...
+2025-04-26 23:53:26 - uvicorn.error - INFO - Started server process [16764]
+2025-04-26 23:53:26 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:53:26 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:54:15 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:54:16 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-26 23:54:16 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-26 23:54:16 - uvicorn.error - INFO - Finished server process [16764]
+2025-04-26 23:54:21 - app.main - INFO - Starting...
+2025-04-26 23:54:21 - uvicorn.error - INFO - Started server process [25472]
+2025-04-26 23:54:21 - uvicorn.error - INFO - Waiting for application startup.
+2025-04-26 23:54:21 - uvicorn.error - INFO - Application startup complete.
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - select pg_catalog.version()
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - select current_schema()
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - show standard_conforming_strings
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - [raw sql] ()
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - BEGIN (implicit)
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - SELECT users.username, users.email, users.hashed_password, users.is_active, users.created_at, users.updated_at, users.id 
+FROM users 
+WHERE users.username = $1::VARCHAR
+2025-04-26 23:54:21 - sqlalchemy.engine.Engine - INFO - [generated in 0.00099s] ('trungnam',)
+2025-04-26 23:54:22 - sqlalchemy.engine.Engine - INFO - ROLLBACK
+2025-04-26 23:54:22 - uvicorn.access - INFO - 127.0.0.1:56022 - "POST /api/v1/users/login HTTP/1.1" 200
+2025-04-26 23:58:25 - uvicorn.error - INFO - Shutting down
+2025-04-26 23:58:25 - uvicorn.error - INFO - Waiting for application shutdown.
+2025-04-26 23:58:25 - uvicorn.error - INFO - Application shutdown complete.
+2025-04-26 23:58:25 - uvicorn.error - INFO - Finished server process [25472]

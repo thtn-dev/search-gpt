@@ -12,11 +12,27 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
+import { signIn, useSession } from "next-auth/react";
 
 function ChatPage() {
+  const { data: session, status } = useSession();
   const runtime = useChatRuntime({
     api: "/api/chat",
   });
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div>
+        <p>Bạn chưa đăng nhập</p>
+        <button onClick={() => signIn()}>Đăng nhập</button>
+      </div>
+    );
+  }
+
   return (
       
       <AssistantRuntimeProvider runtime={runtime}>
@@ -28,7 +44,7 @@ function ChatPage() {
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
                 <BreadcrumbLink href="#">
-                  Building Your Application
+                  Building Your Application {session?.user.email}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
