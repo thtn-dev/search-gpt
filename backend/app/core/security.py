@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
-from typing import Any
-
+from typing import Any, Dict, Union
 import bcrypt
-import jwt
 from cryptography.fernet import Fernet
+import jwt
 
 from app.config.settings import  settings
 
@@ -12,7 +11,7 @@ fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
 JWT_ALGORITHM = "HS256"
 
 
-def create_access_token(subject: str | Any, expires_delta: timedelta = None) -> str:
+def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None, additional_claims: Dict[str, Any] = None) -> str:
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
@@ -21,11 +20,16 @@ def create_access_token(subject: str | Any, expires_delta: timedelta = None) -> 
         )
     to_encode = {"exp": expire, "sub": str(subject), "type": "access"}
 
+    # Thêm các claims tùy chọn nếu chúng được cung cấp
+    if additional_claims:
+        to_encode.update(additional_claims)
+
     return jwt.encode(
         payload=to_encode,
         key=settings.ENCRYPT_KEY,
         algorithm=JWT_ALGORITHM,
     )
+
 
 
 def create_refresh_token(subject: str | Any, expires_delta: timedelta = None) -> str:

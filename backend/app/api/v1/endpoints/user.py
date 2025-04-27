@@ -1,22 +1,23 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
-from app.core.security import get_password_hash
-from app.database.session import get_session2
+from app.core.security import create_access_token, get_password_hash, verify_password
+from app.database.session import get_async_session
 from app.models.user_model import UserModel
-from app.schemas.user.create_user_schema import UserCreate, UserRead
+from app.schemas.user.create_user_schema import UserCreate, UserLogin, UserLoginResponse, UserRead
+from app.services.auth_service import get_current_user
 from app.utils.security import hash_password
 from sqlalchemy.exc import IntegrityError
 router = APIRouter()
 
 @router.post("/users/", response_model=UserRead, status_code=status.HTTP_201_CREATED, tags=["Users"])
 async def create_new_user(
-    *, # Dấu * yêu cầu các tham số sau phải là keyword arguments
-    session: AsyncSession = Depends(get_session2),
-    user_in: UserCreate # Dữ liệu user từ request body, được validate bởi UserCreate
+    *, 
+    session: AsyncSession = Depends(get_async_session),
+    user_in: UserCreate 
 ):
     """
-    Tạo một người dùng mới trong hệ thống.
+    Create a new user in the system.
     """
    
     statement = select(UserModel).where(
@@ -78,3 +79,53 @@ async def create_new_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An internal server error occurred.",
         )
+        
+@router.post("/users/login", response_model=UserLoginResponse, tags=["Users"])
+async def login_user(
+    *, 
+    session: AsyncSession = Depends(get_async_session),
+    user_in: UserLogin = Body(...)
+):
+    """
+    Login a user and return the user information.
+    """
+    statement = select(UserModel).where(
+        UserModel.username == user_in.username
+    )
+    result = await session.execute(statement)
+    db_user = result.scalars().first()
+    
+    if not db_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+    
+    # Kiểm tra mật khẩu
+    if not verify_password(user_in.password, db_user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password",
+        )
+        
+    additional_claims = {"username": db_user.username, "email": db_user.email, }
+        
+    access_token = create_access_token(subject=db_user.id, additional_claims=additional_claims)
+    
+    response = UserLoginResponse(
+            accessToken=access_token,
+            user=db_user
+        )
+    
+    return response
+
+
+@router.post("/users/ping", response_model=str, tags=["Users"])
+async def ping(
+    *, 
+    current_user: UserRead = Depends(get_current_user)
+):
+    """
+    Ping the server to check if the user is authenticated.
+    """
+    return "Pong! " + str(current_user.id)

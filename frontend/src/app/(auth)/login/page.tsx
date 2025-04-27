@@ -22,23 +22,32 @@ import {
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 const formSchema = z.object({
-  email: z.string().email(),
+  username: z.string(),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 const Login05Page = () => {
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
+    const result = await signIn("credentials", { username: data.username, password: data.password, redirect: false });
+    if (result?.error) {
+      console.error(result.error);
+    } else {
+      router.push('/');
+      router.refresh();
+    }
   };
 
   return (
@@ -100,14 +109,14 @@ const Login05Page = () => {
             >
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Email"
+                        type="text"
+                        placeholder="Username"
                         className="w-full"
                         {...field}
                       />

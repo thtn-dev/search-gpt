@@ -20,3 +20,18 @@ class UserRead(SQLModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime
+    
+class UserLoggedIn(SQLModel):
+    id: int
+    username: str
+    email: str
+
+class UserLogin(SQLModel):
+    username: str
+    password: str
+    
+    
+class UserLoginResponse(SQLModel):
+    accessToken: str
+    tokenType: str = "Bearer"
+    user: UserRead
