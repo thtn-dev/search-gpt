@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import type { NextRequest } from "next/server";
+import { appConfig } from "./config/app-config";
 
 export async function middleware(request: NextRequest) {
     const token = await getToken({
       req: request,
-      secret: "WSOeGdcuWv2Y7Var0uegasIr7x8wgWUBRrDhAnm4C48=",
+      secret: appConfig.nextAuthSecret,
     });
   
     const isAuthenticated = !!token;

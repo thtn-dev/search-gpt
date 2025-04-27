@@ -1,10 +1,11 @@
+import { appConfig } from "@/config/app-config";
 import { login } from "@/lib/auth";
 import { NextAuthOptions, User } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 export const AUTH_OPTIONS: NextAuthOptions = {
-  secret: "WSOeGdcuWv2Y7Var0uegasIr7x8wgWUBRrDhAnm4C48=",
+  secret: appConfig.nextAuthSecret,
   providers: [
     CredentialsProvider({
       name: "credentials",
