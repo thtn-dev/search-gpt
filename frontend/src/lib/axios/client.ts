@@ -1,9 +1,10 @@
+import { appConfig } from '@/config/app-config';
 import axios from 'axios';
 import { getSession } from 'next-auth/react';
 
 // Tạo instance axios với URL base
 const axiosClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000',
+  baseURL: appConfig.apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
