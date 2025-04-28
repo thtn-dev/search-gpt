@@ -5,27 +5,25 @@ from app.core.security import create_access_token, get_password_hash, verify_pas
 from app.database.session import get_async_session
 from app.models.user_model import UserModel
 from app.schemas.user.create_user_schema import UserCreate, UserLogin, UserLoginResponse, UserRead
-from app.services.auth_service import get_current_user
 from sqlalchemy.exc import IntegrityError
-router = APIRouter()
 
-@router.post("/users/", response_model=UserRead, status_code=status.HTTP_201_CREATED, tags=["Users"])
-async def create_new_user(
+router = APIRouter()
+@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+async def register(
     *, 
     session: AsyncSession = Depends(get_async_session),
-    user_in: UserCreate 
-):
+    register_dto: UserCreate):
     """
     Create a new user in the system.
     """
    
     statement = select(UserModel).where(
-        (UserModel.username == user_in.username) | (UserModel.email == user_in.email)
+        (UserModel.username == register_dto.username) | (UserModel.email == register_dto.email)
     )
     result = await session.execute(statement)
     existing_user = result.scalars().first()
     if existing_user:
-        if existing_user.username == user_in.username:
+        if existing_user.username == register_dto.username:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Username already registered",
@@ -37,11 +35,11 @@ async def create_new_user(
             )
 
     # Băm mật khẩu trước khi lưu
-    hashed_password = get_password_hash(user_in.password)
+    hashed_password = get_password_hash(register_dto.password)
 
     # Tạo đối tượng UserModel từ dữ liệu đầu vào và mật khẩu đã băm
     # Loại bỏ password khỏi user_in dict trước khi truyền vào UserModel
-    user_data = user_in.model_dump(exclude={"password"})
+    user_data = register_dto.model_dump(exclude={"password"})
     db_user = UserModel(**user_data, hashed_password=hashed_password)
 
     # Thêm user mới vào session và commit
@@ -78,18 +76,19 @@ async def create_new_user(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An internal server error occurred.",
         )
-        
-@router.post("/users/login", response_model=UserLoginResponse, tags=["Users"])
-async def login_user(
-    *, 
+
+@router.post("/login", response_model=UserLoginResponse)
+async def login(*, 
     session: AsyncSession = Depends(get_async_session),
-    user_in: UserLogin = Body(...)
-):
+    login_dto: UserLogin = Body(...)):
+    """
+    Login user and return access token.
+    """
     """
     Login a user and return the user information.
     """
     statement = select(UserModel).where(
-        UserModel.username == user_in.username
+        UserModel.username == login_dto.username
     )
     result = await session.execute(statement)
     db_user = result.scalars().first()
@@ -101,7 +100,7 @@ async def login_user(
         )
     
     # Kiểm tra mật khẩu
-    if not verify_password(user_in.password, db_user.hashed_password):
+    if not verify_password(login_dto.password, db_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password",
@@ -117,14 +116,3 @@ async def login_user(
         )
     
     return response
-
-
-@router.post("/users/ping", response_model=str, tags=["Users"])
-async def ping(
-    *, 
-    current_user: UserRead = Depends(get_current_user)
-):
-    """
-    Ping the server to check if the user is authenticated.
-    """
-    return "Pong! " + str(current_user.id)
