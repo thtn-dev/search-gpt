@@ -3,42 +3,69 @@ import re
 from typing import Annotated
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlmodel import SQLModel
-class UserCreateSchema(SQLModel):
+
+class UserCreate(SQLModel):
+    """
+    User registration schema.
+    """
     email: EmailStr
     username: Annotated[str, Field(min_length=3, max_length=50)]
     password: Annotated[str, Field(min_length=8, max_length=128)]
 
-class UserLoginSchema(BaseModel):
-    emailOrUsername: str = Field(..., min_length=3, max_length=50)
-    password: str = Field(..., min_length=8, max_length=128)
-
-    @field_validator("emailOrUsername")
+    @field_validator("password")
     @classmethod
-    def validate_email_or_username(cls, value):
-        try:
-            EmailStr.validate(value)
-            return value
-        except Exception:
-            pass
+    def validate_password(cls, value):
+        """
+        Password testing must meet the following conditions:
+        - At least 8 characters
+        - At least one capital letter (A-Z)
+        - At least one normal letter (A-Z)
+        - At least one digit (0-9)
+        """
+        # Biểu thức chính quy kết hợp các điều kiện:
+        # ^            : Bắt đầu chuỗi
+        # (?=.*[A-Z]) : Positive lookahead - Đảm bảo có ít nhất 1 chữ hoa ở bất kỳ đâu
+        # (?=.*[a-z]) : Positive lookahead - Đảm bảo có ít nhất 1 chữ thường ở bất kỳ đâu
+        # (?=.*\d)    : Positive lookahead - Đảm bảo có ít nhất 1 chữ số ở bất kỳ đâu
+        # .{8,128}       : Khớp với bất kỳ ký tự nào (ngoại trừ newline) ít nhất 8 lần và tối đa 128 lần
+        # $            : Kết thúc chuỗi
+        password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,128}$"
 
-        if re.fullmatch(r"^\w{3,50}$", value):
-            return value
+        if not re.match(password_regex, value):
+            raise ValueError("Password must have at least 8 characters, including uppercase, normal and number")
+        return value
 
-        raise ValueError("EmailOrUsername must be a valid email or a valid username (including words, numbers, lower bricks, 3-50 characters)")
+class UserLogin(BaseModel):
+    """
+    User login schema.
+    """
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=128)
 
     @field_validator("password")
     @classmethod
     def validate_password(cls, value):
-        if (
-            len(value) >= 8 and
-            re.search(r"[A-Z]", value) and
-            re.search(r"[a-z]", value) and
-            re.search(r"\d", value)
-        ):
-            return value
-        raise ValueError("Password must have at least 8 characters, including uppercase, normal and number")
+        """
+        Password testing must meet the following conditions:
+        - At least 8 characters
+        - At least one capital letter (A-Z)
+        - At least one normal letter (A-Z)
+        - At least one digit (0-9)
+        """
+        # Biểu thức chính quy kết hợp các điều kiện:
+        # ^            : Bắt đầu chuỗi
+        # (?=.*[A-Z]) : Positive lookahead - Đảm bảo có ít nhất 1 chữ hoa ở bất kỳ đâu
+        # (?=.*[a-z]) : Positive lookahead - Đảm bảo có ít nhất 1 chữ thường ở bất kỳ đâu
+        # (?=.*\d)    : Positive lookahead - Đảm bảo có ít nhất 1 chữ số ở bất kỳ đâu
+        # .{8,128}       : Khớp với bất kỳ ký tự nào (ngoại trừ newline) ít nhất 8 lần và tối đa 128 lần
+        # $            : Kết thúc chuỗi
+        password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,128}$"
 
-class UserBaseSchema(SQLModel):
+        if not re.match(password_regex, value):
+            raise ValueError("Password must have at least 8 characters, including uppercase, normal and number")
+        return value
+
+class UserBase(SQLModel):
     id: int
     username: str
     email: str
@@ -47,9 +74,9 @@ class UserBaseSchema(SQLModel):
 class UserLoginResponse(BaseModel):
     accessToken: str
     tokenType: str = "Bearer"
-    user: UserBaseSchema
+    user: UserBase
 
-class UserLoggedInSchema(SQLModel):
+class UserLoggedIn(SQLModel):
     id: int
     username: str
     email: str

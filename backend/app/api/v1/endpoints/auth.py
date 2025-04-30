@@ -4,11 +4,12 @@ from sqlmodel import select
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.database.session import get_async_session
 from app.models.user_model import UserModel
-from app.schemas.user.create_user_schema import UserCreate, UserLogin, UserLoginResponse, UserRead
 from sqlalchemy.exc import IntegrityError
 
+from app.schemas.user_schema import UserLogin, UserLoginResponse, UserBase, UserCreate
+
 router = APIRouter()
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=UserBase, status_code=status.HTTP_201_CREATED)
 async def register(
     *, 
     session: AsyncSession = Depends(get_async_session),
@@ -88,7 +89,7 @@ async def login(*,
     Login a user and return the user information.
     """
     statement = select(UserModel).where(
-        UserModel.username == login_dto.username
+        UserModel.email == login_dto.email
     )
     result = await session.execute(statement)
     db_user = result.scalars().first()
@@ -99,7 +100,6 @@ async def login(*,
             detail="User not found",
         )
     
-    # Kiểm tra mật khẩu
     if not verify_password(login_dto.password, db_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
