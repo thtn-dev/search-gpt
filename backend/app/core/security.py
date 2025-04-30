@@ -5,6 +5,7 @@ from cryptography.fernet import Fernet
 import jwt
 
 from app.config.settings import  settings
+from app.utils.uuid6 import uuid6
 
 fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
 
@@ -18,7 +19,10 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta = Non
         expire = datetime.utcnow() + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
-    to_encode = {"exp": expire, "sub": str(subject), "type": "access"}
+
+    jti = uuid6()
+    iat = datetime.utcnow()
+    to_encode = {"exp": expire, "sub": str(subject), "type": "access_token", "jti": str(jti), "iat": iat}
 
     # Thêm các claims tùy chọn nếu chúng được cung cấp
     if additional_claims:
