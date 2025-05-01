@@ -8,6 +8,7 @@ from app.schemas.user.create_user_schema import UserLoggedIn, UserRead
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Security(HTTPBearer())):
     try:
+        print(f"Token: {credentials.credentials}")
         payload = decode_token(credentials.credentials)
         user_id: str = payload.get("sub")
         if user_id is None:

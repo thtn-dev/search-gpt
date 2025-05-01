@@ -25,7 +25,7 @@ import { z } from "zod";
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 const formSchema = z.object({
-  username: z.string(),
+  email: z.string(),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
@@ -33,7 +33,7 @@ const Login05Page = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
     resolver: zodResolver(formSchema),
@@ -41,7 +41,7 @@ const Login05Page = () => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
-    const result = await signIn("credentials", { username: data.username, password: data.password, redirect: false });
+    const result = await signIn("credentials", { email: data.email, password: data.password, redirect: false });
     if (result?.error) {
       console.error(result.error);
     } else {
@@ -63,6 +63,7 @@ const Login05Page = () => {
               variant="outline"
               size="icon"
               className="rounded-full h-10 w-10"
+              onClick={() => signIn("google")}
             >
               <GithubIcon className="!h-[18px] !w-[18px]" />
             </Button>
@@ -109,14 +110,14 @@ const Login05Page = () => {
             >
               <FormField
                 control={form.control}
-                name="username"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        type="text"
-                        placeholder="Username"
+                        type="email"
+                        placeholder="Email"
                         className="w-full"
                         {...field}
                       />

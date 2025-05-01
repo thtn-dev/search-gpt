@@ -1,23 +1,14 @@
-from sqlmodel import Relationship, SQLModel, Field
-from typing import TYPE_CHECKING, List, Optional
+from sqlmodel import SQLModel, Field
+from typing import  Optional
 from datetime import datetime, timezone
-
-if TYPE_CHECKING:
-    from app.models.user_model import UserModel  # noqa: F401
-    from app.models.message_model import MessageModel  # noqa: F401
+import uuid
+from app.utils.uuid6 import uuid6
 class ThreadBase(SQLModel):
     title: str = Field(default=None, index=True)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    user_id: int = Field(foreign_key="users.id", index=True)
+    user_id: Optional[int] = Field(default=None, index=True)
 
 class ThreadModel(ThreadBase, table=True):
     __tablename__ = "threads"
-    id: Optional[str] = Field(default=None, primary_key=True)
-    
-    messages: List["MessageModel"] = Relationship(  
-        back_populates="thread")  
-    user: "UserModel" = Relationship( 
-        back_populates="threads") 
-
-
+    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)

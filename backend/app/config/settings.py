@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int 
     ENCRYPT_KEY: str 
     REFRESH_TOKEN_EXPIRE_MINUTES: int 
+    GOOGLE_CLIENT_ID: str
     class Config:
         env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
         env_file_encoding = "utf-8"
