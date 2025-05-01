@@ -5,7 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { redirect } from "next/navigation";
 import axiosServer from "../axios/server";
 
-export type User = {
+export type AppUser = {
   id: string;
   email: string;
   username: string;
@@ -13,13 +13,13 @@ export type User = {
 
 export type LoginResponse = {
   accessToken: string;
-  user: User;
+  user: AppUser;
 };
 
-export async function login(username: string, password: string) {
+export async function login(email: string, password: string) {
   try {
-    const res = await axiosServer.post<LoginResponse>("/api/v1/users/login", {
-      username,
+    const res = await axiosServer.post<LoginResponse>("/api/v1/auth/login", {
+      email,
       password,
     });
     const data = res.data;
@@ -35,7 +35,7 @@ export async function logout() {
   redirect("/login");
 }
 
-export async function getUser(): Promise<User | null> {
+export async function getUser(): Promise<AppUser | null> {
   const token = (await cookies()).get("token");
 
   if (!token) {
@@ -43,7 +43,7 @@ export async function getUser(): Promise<User | null> {
   }
 
   try {
-    const decoded = jwtDecode<User>(token.value);
+    const decoded = jwtDecode<AppUser>(token.value);
     return decoded;
   } catch {
     return null;

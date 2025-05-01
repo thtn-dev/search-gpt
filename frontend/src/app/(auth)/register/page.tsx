@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { AuthApi } from "@/lib/api/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   FigmaIcon,
@@ -25,6 +26,7 @@ import { z } from "zod";
 
 const formSchema = z.object({
   email: z.string().email(),
+  username: z.string().min(3, "Username must be at least 3 characters long"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
@@ -32,13 +34,15 @@ const SignUp05Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       email: "",
+      username: "",
       password: "",
     },
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
+    await AuthApi.register(data)
   };
 
   return (
@@ -116,6 +120,26 @@ const SignUp05Page = () => {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Username"
+                        className="w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="password"

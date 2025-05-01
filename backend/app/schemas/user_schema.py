@@ -81,4 +81,17 @@ class UserLoggedIn(SQLModel):
     username: str
     email: str
     
-        
+
+class GoogleTokenData(BaseModel):
+    """Model to receive the Google ID Token from Next.js backend"""
+    google_id_token: str
+
+class TokenPayload(BaseModel):
+    """Payload data inside our FastAPI JWT"""
+    sub: str # Subject (usually user ID or email)
+    # Add other claims if needed, e.g., roles
+
+class TokenResponse(BaseModel):
+    """Response model containing the FastAPI access token"""
+    access_token: str
+    token_type: str = "bearer"
