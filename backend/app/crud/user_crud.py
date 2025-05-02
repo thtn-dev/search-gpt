@@ -210,9 +210,13 @@ class UserCRUD:
                 .selectinload(UserModel.linked_accounts)
             )
         )
-        results = await self.session.exec(statement)
-        linked_account = results.one_or_none() # Dùng one_or_none() an toàn hơn
-        return linked_account.user if linked_account else None
+        results = await self.session.execute(statement)
+        linked_account = results.scalars().first()
+        # Kiểm tra xem linked_account có tồn tại không
+        if linked_account and linked_account.user:
+            logger.info(f"Tìm thấy LinkedAccount và User tồn tại qua provider_id. User ID: {linked_account.user.id}")
+            return linked_account.user
+        return None
 
     async def get_user_by_email(self, email: EmailStr) -> Optional[UserModel]:
         """
@@ -225,8 +229,8 @@ class UserCRUD:
             .where(UserModel.email == email)
             .options(selectinload(UserModel.linked_accounts)) # Tải luôn linked_accounts
         )
-        results = await self.session.exec(statement)
-        return results.one_or_none() # Dùng one_or_none()
+        results = await self.session.execute(statement)
+        return results.scalars().first()
 
     async def link_provider_to_user(
         self, user: UserModel, provider: AuthProvider, provider_key: str
@@ -325,7 +329,7 @@ class UserCRUD:
         # Tạo linked account ban đầu
         new_linked_account = LinkedAccountModel(
             provider=user_info.provider.value,
-            provider_key=str(user_info.provider_id), # Đảm bảo là string
+            provider_key=str(user_info.provider_key), # Đảm bảo là string
             # user=new_user # Liên kết qua relationship
         )
         # Thêm linked account vào list của user (SQLModel/SQLAlchemy sẽ xử lý liên kết)
@@ -385,7 +389,7 @@ class UserCRUD:
         """
         # --- Input Validation ---
         provider = user_info.provider
-        provider_key = str(user_info.provider_id) # Đảm bảo là string
+        provider_key = str(user_info.provider_key) # Đảm bảo là string
         email = user_info.email
 
         if not provider_key:

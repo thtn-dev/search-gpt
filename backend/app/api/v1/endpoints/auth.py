@@ -190,7 +190,7 @@ async def verify_google_token(token_data: GoogleTokenData = Body(...), crud: Use
         )
         
         
-@router.post("/auth/nextauth-signin", response_model=UserLoginResponse)
+@router.post("/nextauth-signin", response_model=UserLoginResponse)
 async def handle_nextauth_signin(
     payload: NextAuthSigninPayload = Body(...),
     crud: UserCRUD = Depends(UserCRUD),
