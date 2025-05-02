@@ -3,6 +3,7 @@ import re
 from typing import Annotated
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlmodel import SQLModel
+from pydantic.alias_generators import to_camel 
 
 class UserCreate(SQLModel):
     """
@@ -29,7 +30,7 @@ class UserCreate(SQLModel):
         # (?=.*\d)    : Positive lookahead - Đảm bảo có ít nhất 1 chữ số ở bất kỳ đâu
         # .{8,128}       : Khớp với bất kỳ ký tự nào (ngoại trừ newline) ít nhất 8 lần và tối đa 128 lần
         # $            : Kết thúc chuỗi
-        password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,128}$"
+        password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,128}$"
 
         if not re.match(password_regex, value):
             raise ValueError("Password must have at least 8 characters, including uppercase, normal and number")
@@ -59,7 +60,7 @@ class UserLogin(BaseModel):
         # (?=.*\d)    : Positive lookahead - Đảm bảo có ít nhất 1 chữ số ở bất kỳ đâu
         # .{8,128}       : Khớp với bất kỳ ký tự nào (ngoại trừ newline) ít nhất 8 lần và tối đa 128 lần
         # $            : Kết thúc chuỗi
-        password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{6,128}$"
+        password_regex = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,128}$"
 
         if not re.match(password_regex, value):
             raise ValueError("Password must have at least 8 characters, including uppercase, normal and number")
@@ -71,10 +72,41 @@ class UserBase(SQLModel):
     email: str
     is_active: bool
 
+    # model_config = {
+    #     "alias_generator": to_camel,
+    #     "populate_by_name": True,
+    #     "json_schema_extra": {
+    #         "example": {
+    #             "id": 1,
+    #             "username": "string",
+    #             "email": "string",
+    #             "isActive": True
+    #         }
+    #     }
+    # }
+
 class UserLoginResponse(BaseModel):
-    accessToken: str
-    tokenType: str = "Bearer"
+    """Response model for user login."""
+    access_token: str
+    token_type: str = "Bearer"
     user: UserBase
+
+    # model_config = {
+    #     "alias_generator": to_camel,
+    #     "populate_by_name": True,
+    #     "json_schema_extra": {
+    #         "example": {
+    #             "accessToken": "string",
+    #             "tokenType": "Bearer",
+    #             "user": {
+    #                 "id": 1,
+    #                 "username": "string",
+    #                 "email": "string",
+    #                 "isActive": True
+    #             }
+    #         }
+    #     }
+    # }
 
 class UserLoggedIn(SQLModel):
     id: int
