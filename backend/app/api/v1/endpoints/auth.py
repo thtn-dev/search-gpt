@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 from app.config.settings import settings
 from app.core.security import create_access_token, get_password_hash, verify_password
+from app.crud.user_crud import UserCRUD
 from app.database.session import get_async_session
 from app.models.user_model import LinkedAccountModel, UserModel
 from sqlalchemy.exc import IntegrityError
@@ -118,7 +119,7 @@ async def login(*,
     access_token = create_access_token(subject=db_user.id, additional_claims=additional_claims)
     
     response = UserLoginResponse(
-            accessToken=access_token,
+            access_token=access_token,
             user=db_user
         )
     
@@ -126,7 +127,7 @@ async def login(*,
 
 
 @router.post("/google/verify-token", response_model=UserLoginResponse)
-async def verify_google_token(token_data: GoogleTokenData = Body(...), session: AsyncSession = Depends(get_async_session)):
+async def verify_google_token(token_data: GoogleTokenData = Body(...), crud: UserCRUD = Depends(UserCRUD)):
     """
     Receives Google ID Token from Next.js backend, verifies it,
     finds/creates user, and returns a FastAPI JWT.
@@ -150,7 +151,7 @@ async def verify_google_token(token_data: GoogleTokenData = Body(...), session: 
         # --- User Lookup / Creation ---
         # idinfo contains verified user data like: sub, email, name, picture etc.
         print("Google ID Token Verified Successfully. User Info:", idinfo)
-        db_user = await get_or_create_user(idinfo, session)
+        db_user = await crud.get_or_create_google_user(idinfo)
 
         # --- Create FastAPI Access Token ---
         # Create the payload for our JWT. 'sub' should be the unique identifier in *your* system.
@@ -163,7 +164,7 @@ async def verify_google_token(token_data: GoogleTokenData = Body(...), session: 
 
         print(f"Generated FastAPI token for user: {db_user.id}")
         return UserLoginResponse(
-            accessToken=access_token,
+            access_token=access_token,
             user=db_user
         )
 
