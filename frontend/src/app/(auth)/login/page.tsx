@@ -12,18 +12,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  FigmaIcon,
-  GithubIcon,
-  InstagramIcon,
-  TwitchIcon,
-  TwitterIcon,
-} from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from "next/image";
 const formSchema = z.object({
   email: z.string(),
   password: z.string().min(8, "Password must be at least 8 characters long"),
@@ -55,7 +49,7 @@ const Login05Page = () => {
       <div className="w-full h-full grid lg:grid-cols-2 p-4">
         <div className="max-w-xs m-auto w-full flex flex-col items-center">
           <p className="mt-4 text-xl font-bold tracking-tight">
-            Log in to Shadcn Blocks
+            Log in to Search AI
           </p>
 
           <div className="mt-8 flex items-center gap-3">
@@ -65,35 +59,41 @@ const Login05Page = () => {
               className="rounded-full h-10 w-10"
               onClick={() => signIn("google")}
             >
-              <GithubIcon className="!h-[18px] !w-[18px]" />
+              <Image
+                src={"/icons/google.svg"}
+                alt="Google"
+                width={18}
+                height={18}
+                className="!h-[18px] !w-[18px]"
+              />
             </Button>
             <Button
               variant="outline"
               size="icon"
               className="rounded-full h-10 w-10"
+              onClick={() => signIn("github")}
             >
-              <InstagramIcon className="!h-[18px] !w-[18px]" />
+              <Image
+                src={"/icons/github.svg"}
+                alt="Github"
+                width={18}
+                height={18}
+                className="!h-[18px] !w-[18px]"
+              />
             </Button>
             <Button
               variant="outline"
               size="icon"
               className="rounded-full h-10 w-10"
+              onClick={() => signIn("azure-ad")}
             >
-              <TwitterIcon className="!h-[18px] !w-[18px]" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
-            >
-              <FigmaIcon className="!h-[18px] !w-[18px]" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
-            >
-              <TwitchIcon className="!h-[18px] !w-[18px]" />
+              <Image
+                src={"/icons/microsoft.svg"}
+                alt="Azure AD"
+                width={18}
+                height={18}
+                className="!h-[18px] !w-[18px]"
+              />
             </Button>
           </div>
 
@@ -152,20 +152,29 @@ const Login05Page = () => {
 
           <div className="mt-5 space-y-5">
             <Link
-              href="#"
+              href="/forgot-password"
               className="text-sm block underline text-muted-foreground text-center"
             >
               Forgot your password?
             </Link>
             <p className="text-sm text-center">
               Don&apos;t have an account?
-              <Link href="#" className="ml-1 underline text-muted-foreground">
+              <Link href="/register" className="ml-1 underline text-muted-foreground">
                 Create account
               </Link>
             </p>
           </div>
         </div>
-        <div className="bg-muted hidden lg:block rounded-lg" />
+        <div className="bg-muted/60 hidden lg:block rounded-lg">
+          <div className="relative w-full h-full">
+            <Image
+              src="/images/login-illustration.webp"
+              alt="Login Illustration"
+              fill
+              className="object-cover rounded-lg"
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
