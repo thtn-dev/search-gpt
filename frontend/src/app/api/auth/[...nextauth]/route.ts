@@ -5,14 +5,34 @@ import { NextAuthOptions, User } from "next-auth";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from 'next-auth/providers/google';
+import GitHubProvider from "next-auth/providers/github";
+import AzureADProvider from "next-auth/providers/azure-ad";
 
 export const AUTH_OPTIONS: NextAuthOptions = {
   secret: appConfig.nextAuthSecret,
   providers: [
+    // Google OAuth
     GoogleProvider({
       clientId: appConfig.googleClientId,
       clientSecret: appConfig.googleClientSecret,
     }),
+    // GitHub OAuth 
+    GitHubProvider({
+      clientId: appConfig.githubClientId,
+      clientSecret: appConfig.githubClientSecret,
+    }),
+    // Microsoft Azure AD OAuth
+    AzureADProvider({
+      clientId: appConfig.microsoftClientId,
+      clientSecret: appConfig.microsoftClientSecret,
+      tenantId: appConfig.microsoftTenantId,
+      authorization: {
+        params: {
+          scope: "openid email offline_access",
+        },
+      },
+    }),
+    // Credentials Provider
     CredentialsProvider({
       name: "credentials",
       type: "credentials",
@@ -42,6 +62,11 @@ export const AUTH_OPTIONS: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user, account , profile }) {
+
+      console.log('user', user)
+      console.log('account', account)
+      console.log('profile', profile)
+
       if (account && user && account.provider === "google"){
         console.log("Initial Google Sign-in, calling FastAPI...");
         const googleIdToken = account.id_token; 
