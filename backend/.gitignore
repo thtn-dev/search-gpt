@@ -123,4 +123,5 @@ dmypy.json
 # pyright
 .pyright/
 
+logs/
 # End of file
