@@ -110,6 +110,12 @@ async def login(*,
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
+        
+    if db_user.hashed_password == None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User has no password set",
+        )
     
     if not verify_password(login_dto.password, db_user.hashed_password):
         raise HTTPException(

@@ -15,23 +15,20 @@ import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import AzureADProvider from "next-auth/providers/azure-ad";
 
-// Định nghĩa kiểu AuthProvider để nhất quán với backend
-type AuthProvider = "google" | "github" | "azure-ad"; // Thêm các provider khác nếu có
+type AuthProvider = "google" | "github" | "azure-ad"; 
 
 export const AUTH_OPTIONS: NextAuthOptions = {
-  secret: appConfig.nextAuthSecret, // Rất quan trọng!
+  secret: appConfig.nextAuthSecret,
   providers: [
     // Google OAuth
     GoogleProvider({
       clientId: appConfig.googleClientId,
       clientSecret: appConfig.googleClientSecret,
-      // PKCE được dùng mặc định
     }),
     // GitHub OAuth
     GitHubProvider({
       clientId: appConfig.githubClientId,
       clientSecret: appConfig.githubClientSecret,
-      // PKCE được dùng mặc định
     }),
     // Microsoft Azure AD OAuth
     AzureADProvider({
@@ -40,14 +37,10 @@ export const AUTH_OPTIONS: NextAuthOptions = {
       tenantId: appConfig.microsoftTenantId,
       authorization: {
         params: {
-          // offline_access để lấy refresh_token (nếu cần)
-          // openid, email, profile là các scope OIDC chuẩn
           scope: "openid email profile offline_access",
         },
       },
-      // PKCE được dùng mặc định
     }),
-    // Credentials Provider (Giữ nguyên nếu bạn vẫn cần)
     CredentialsProvider({
       name: "credentials",
       type: "credentials",
@@ -60,33 +53,25 @@ export const AUTH_OPTIONS: NextAuthOptions = {
           return null;
         }
         try {
-          // Gọi hàm login API của bạn (có thể là endpoint khác của FastAPI)
           const data = await login(credentials.email, credentials.password);
-          // Tạo đối tượng User cho NextAuth
-          // Lưu ý: accessToken ở đây nên là FastAPI token nếu hàm login trả về nó
           const user: User = {
-            id: data.user.id, // ID từ hệ thống của bạn
+            id: data.user.id,
             email: data.user.email,
-            name: data.user.username, // Hoặc full_name tùy ý
-            accessToken: data.accessToken, // FastAPI token
+            name: data.user.username, 
+            accessToken: data.access_token,
           };
           return user;
         } catch (error) {
-          console.error("Credentials login failed:", error);
-          return null; // Trả về null nếu authorize thất bại
+          throw error; 
         }
       },
     }),
   ],
+  debug: true,
   session: {
-    strategy: "jwt", // Bắt buộc dùng JWT để tùy chỉnh token và session
+    strategy: "jwt", 
   },
   callbacks: {
-    /**
-     * Callback này được gọi khi JWT được tạo (lần đầu đăng nhập) hoặc cập nhật.
-     * Nó chạy *trước* callback `session`.
-     * Chúng ta sẽ gọi FastAPI tại đây để lấy token nội bộ.
-     */
     async jwt({
       token,
       user,
@@ -101,24 +86,15 @@ export const AUTH_OPTIONS: NextAuthOptions = {
       // `user` là đối tượng user trả về từ provider hoặc hàm authorize (chỉ có khi đăng nhập lần đầu).
       // `account` chứa thông tin từ provider (access_token, id_token, provider...) (chỉ có khi đăng nhập lần đầu).
       // `profile` chứa thông tin user profile từ provider (chỉ có khi đăng nhập lần đầu với OAuth).
-
       const isSignIn = !!(user && account); // Kiểm tra xem đây có phải là lần đăng nhập đầu tiên không
       const isCredentials = account?.provider === "credentials"; // Kiểm tra provider credentials
-
-      console.log(
-        `JWT Callback: isSignIn=${isSignIn}, Provider=${account?.provider}`
-      );
-      // console.log("JWT token in:", token);
-      // console.log("User in:", user);
-      // console.log("Account in:", account);
-
       // --- Xử lý đăng nhập bằng Credentials ---
       if (isSignIn && isCredentials && user) {
         console.log("Handling Credentials sign-in...");
         // User đã chứa FastAPI token từ hàm authorize
         const extendedUser = user as User;
-        token.accessToken = extendedUser.accessToken; // Lưu FastAPI token
-        token.sub = extendedUser.id; // Đặt subject là ID hệ thống
+        token.accessToken = extendedUser.accessToken; 
+        token.sub = extendedUser.id; 
         token.email = extendedUser.email;
         token.name = extendedUser.name;
         token.picture = extendedUser.image; // Nếu có
@@ -128,9 +104,7 @@ export const AUTH_OPTIONS: NextAuthOptions = {
 
       // --- Xử lý đăng nhập bằng OAuth Provider ---
       if (isSignIn && account && !isCredentials) {
-        console.log(
-          `Handling OAuth sign-in for provider: ${account.provider}...`
-        );
+        
         const provider = account.provider as AuthProvider;
 
         // Chuẩn bị payload để gửi đến FastAPI
@@ -176,12 +150,7 @@ export const AUTH_OPTIONS: NextAuthOptions = {
             }
           );
 
-          const { accessToken, user: user2 } = res.data;
-
-          console.log("FastAPI response:", res.data);
-
-          // Kiểm tra response từ FastAPI
-
+          const { access_token : accessToken, user: user2 } = res.data;
           if (res.status === 200 && accessToken) {
             console.log(
               "FastAPI verification successful. Storing FastAPI token."
@@ -191,7 +160,7 @@ export const AUTH_OPTIONS: NextAuthOptions = {
               id: user2.email,
               email: user2.email,
               name: user2.username,
-              image: "", // Có thể thêm ảnh nếu cần
+              image: "", // Có thể thêm ảnh nếu cầnJWT token out
               accessToken: accessToken, // Lưu access token từ FastAPI vào token
             };
             token.user = tokenUser;
@@ -202,8 +171,6 @@ export const AUTH_OPTIONS: NextAuthOptions = {
         }
       }
 
-      // Trả về token đã được cập nhật (hoặc token cũ nếu không phải lần đăng nhập đầu)
-      // console.log("JWT token out:", token);
       return token;
     },
 
@@ -213,15 +180,17 @@ export const AUTH_OPTIONS: NextAuthOptions = {
      */
     async session({ session, token }) {
       if (session?.user) {
-        Object.assign(session.user, token.user);
+        session.user.id = token.sub as string; // ID từ hệ thống của bạn
+        session.user.email = token.email as string; // Email từ token
+        session.user.accessToken = token.accessToken as string; // FastAPI token
+        session.user.name = token.name as string; // Tên từ token
       }
-
       return session;
     },
   },
   pages: {
-    signIn: "/login", // Trang đăng nhập tùy chỉnh của bạn
-    // error: '/auth/error', // Trang hiển thị lỗi tùy chỉnh (tùy chọn)
+    signIn: "/login",
+    signOut: "/login",
   },
 };
 
