@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from "next/image";
 const formSchema = z.object({
   email: z.string(),
@@ -25,6 +25,10 @@ const formSchema = z.object({
 
 const Login05Page = () => {
   const router = useRouter();
+  const params = useSearchParams();
+
+  const callbackUrl = params.get("callbackUrl") || "/";
+
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       email: "",
@@ -35,12 +39,11 @@ const Login05Page = () => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
-    const result = await signIn("credentials", { email: data.email, password: data.password, redirect: false });
+    const result = await signIn("credentials", { email: data.email, password: data.password, redirect: false, callbackUrl: callbackUrl });
     if (result?.error) {
       console.error(result.error);
     } else {
-      router.push('/');
-      router.refresh();
+      router.push(result?.url || "/");
     }
   };
 

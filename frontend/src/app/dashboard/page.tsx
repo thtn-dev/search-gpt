@@ -14,22 +14,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { AuthApi } from "@/lib/api/auth";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
 
 export default function Page() {
-  const {  status } = useSession();
-  console.log(status);
-  useEffect(() => {
-    if (status === 'authenticated') {
-      const fetchData = async () => {
-        const data = await AuthApi.ping();
-        alert(JSON.stringify(data));
-      };
-      fetchData();
-    }
-  }, [status]);
   return (
     <SidebarProvider>
       <AppSidebar />

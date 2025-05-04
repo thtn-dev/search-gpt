@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 import { redirect } from "next/navigation";
 import axiosServer from "../axios/server";
+import axios from "axios";
 
 export type AppUser = {
   id: string;
@@ -12,7 +13,7 @@ export type AppUser = {
 };
 
 export type LoginResponse = {
-  accessToken: string;
+  access_token: string;
   user: AppUser;
 };
 
@@ -24,9 +25,17 @@ export async function login(email: string, password: string) {
     });
     const data = res.data;
     return data;
-  } catch (error) {
-    console.log(error);
-    throw error;
+  } 
+  catch (error) {
+    // check if error is an AxiosError
+    if (axios.isAxiosError(error)) {
+      // Handle the error response from the server
+      const errorMessage = error.response?.data?.detail || "An error occurred";
+      throw new Error(errorMessage);
+    } else {
+      // Handle other types of errors (e.g., network errors)
+      throw new Error("An unexpected error occurred. Please try again.");
+    }
   }
 }
 
