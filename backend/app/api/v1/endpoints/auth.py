@@ -134,68 +134,6 @@ async def login(*,
     
     return response
 
-
-@router.post("/google/verify-token", response_model=UserLoginResponse)
-async def verify_google_token(token_data: GoogleTokenData = Body(...), crud: UserCRUD = Depends(UserCRUD)):
-    """
-    Receives Google ID Token from Next.js backend, verifies it,
-    finds/creates user, and returns a FastAPI JWT.
-    """
-    google_token = token_data.google_id_token
-
-    try:
-        # Verify the ID token using google-auth library
-        # This checks signature, expiration, issuer, and audience
-        idinfo = id_token.verify_oauth2_token(
-            google_token,
-            google_requests.Request(),
-            settings.GOOGLE_CLIENT_ID # Specify your Google Client ID here
-        )
-
-        # --- Optional: Additional Check ---
-        # You might want to double-check the issuer, though verify_oauth2_token usually handles it
-        # if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
-        #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect issuer")
-
-        # --- User Lookup / Creation ---
-        # idinfo contains verified user data like: sub, email, name, picture etc.
-        print("Google ID Token Verified Successfully. User Info:", idinfo)
-        db_user = await crud.get_or_create_google_user(idinfo)
-
-        # --- Create FastAPI Access Token ---
-        # Create the payload for our JWT. 'sub' should be the unique identifier in *your* system.
-        # Here we use the user_id from our DB (which we set to Google's 'sub').
-        additional_claims = {"username": db_user.username, "email": db_user.email, }
-        access_token = create_access_token(
-            subject=db_user.id,
-            additional_claims=additional_claims,
-        )
-
-        print(f"Generated FastAPI token for user: {db_user.id}")
-        return UserLoginResponse(
-            access_token=access_token,
-            user=db_user
-        )
-
-    except ValueError as e:
-        # This can happen if the token is invalid format or library internal errors
-        print(f"Token verification value error: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid Google token format or value",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except Exception as e:
-        # Catch other potential exceptions during verification (e.g., network issues fetching keys)
-        # or during user lookup/creation
-        print(f"An unexpected error occurred: {e}")
-        # Be careful not to expose sensitive error details to the client
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An internal error occurred during token verification or user processing.",
-        )
-        
-        
 @router.post("/nextauth-signin", response_model=UserLoginResponse)
 async def handle_nextauth_signin(
     payload: NextAuthSigninPayload = Body(...),
@@ -210,15 +148,12 @@ async def handle_nextauth_signin(
     try:
         # 1. Verify identity via auth_utils dispatcher
         verified_user_info = await verify_identity_from_nextauth(payload)
-        print(f"Endpoint: Identity verified for {verified_user_info.provider.value}.") # Không log PII ở production
-
         # 2. Get or Create User in DB using CRUD
         db_user_model = await crud.get_or_create_oauth_user(verified_user_info)
 
-        # --- IMPORTANT: Transaction Management ---
         try:
             await crud.session.commit()
-            await crud.session.refresh(db_user_model) # Refresh sau commit để có ID / thông tin mới nhất
+            await crud.session.refresh(db_user_model) 
             print(f"Endpoint: User Get/Create successful & committed. User system ID: {db_user_model.id}")
         except Exception as commit_err:
              # Lỗi khi commit (ví dụ: unique constraint nếu user được tạo đồng thời)
