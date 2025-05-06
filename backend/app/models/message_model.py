@@ -14,6 +14,7 @@ class MessageBase(SQLModel):
     sender: str = Field(default="user") 
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     thread_id: Optional[uuid.UUID] = Field(default=None, index=True)
+    message_id: Optional[str] = Field(default=None, index=True)
     
     role: MessageRole = Field(
         default=MessageRole.USER,
