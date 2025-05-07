@@ -36,5 +36,8 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 start = "uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
 
+[tool.poetry.group.dev.dependencies]
+pylint = "^3.3.7"
+
 [tool.poetry]
 package-mode = false

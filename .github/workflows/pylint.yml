@@ -1,23 +1,45 @@
-name: Pylint
+name: Backend Pylint
 
 on: [push]
 
 jobs:
-  build:
+  lint-backend:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.12"]
+        # Sử dụng các phiên bản Python bạn muốn hỗ trợ, đảm bảo > 3.12.2
+        # setup-python sẽ chọn bản vá mới nhất cho các phiên bản này.
+        # Ví dụ: "3.12" có thể cài đặt 3.12.4 (nếu là bản mới nhất)
+        python-version: ["3.12", "3.13"]
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
+
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+        cache: 'poetry' # Kích hoạt caching cho Poetry
+
+    # setup-python với cache: 'poetry' sẽ tự động cài đặt Poetry nếu chưa có.
+    # Nếu bạn cần một phiên bản Poetry cụ thể hoặc cách cài đặt khác, bạn có thể thêm bước riêng ở đây.
+    # Ví dụ:
+    # - name: Install specific Poetry version
+    #   run: pipx install poetry==<phiên_bản_mong_muốn>
+
+    - name: Install dependencies with Poetry
+      working-directory: ./backend # Chỉ định thư mục làm việc là 'backend'
       run: |
-        python -m pip install --upgrade pip
-        pip install pylint
-    - name: Analysing the code with pylint
+        # --no-interaction: không hỏi tương tác
+        # --no-ansi: không dùng màu sắc/ký tự đặc biệt trong output
+        # --sync: đảm bảo môi trường ảo khớp chính xác với file lock, xóa các gói không cần thiết
+        poetry install --no-interaction --no-ansi --sync
+
+    - name: Run Pylint
+      working-directory: ./backend # Chỉ định thư mục làm việc là 'backend'
       run: |
-        pylint $(git ls-files '*.py')
+        # Chạy pylint thông qua poetry
+        # git ls-files '*.py' sẽ liệt kê các file .py được Git theo dõi trong thư mục hiện tại (backend)
+        poetry run pylint $(git ls-files '*.py')
+        # Một lựa chọn khác, nếu Pylint được cấu hình để tự tìm file trong thư mục hiện tại:
+        # poetry run pylint .
