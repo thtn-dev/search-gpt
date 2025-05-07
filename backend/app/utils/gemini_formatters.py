@@ -1,3 +1,7 @@
+""""
+Module supporting the conversion of chat history to Google Gemini format.
+"""
+
 import base64
 from typing import List
 from google.genai.types import Content, Part

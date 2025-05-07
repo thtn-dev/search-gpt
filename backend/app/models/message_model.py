@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 import uuid
 from sqlmodel import JSON, Column, SQLModel, Field, String
 from typing import  Any, Dict, Optional
@@ -11,7 +12,7 @@ class MessageRole(str, Enum):
 
 class MessageBase(SQLModel):
     content: str = Field()
-    sender: str = Field(default="user") 
+    sender: str = Field(default="user")
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     thread_id: Optional[uuid.UUID] = Field(default=None, index=True)
     message_id: Optional[str] = Field(default=None, index=True)
@@ -19,9 +20,9 @@ class MessageBase(SQLModel):
     role: MessageRole = Field(
         default=MessageRole.USER,
         sa_column=Column(String, nullable=False),
-    ) 
+    )
     message_metadata: Optional[Dict[str, Any]] = Field(
-        default=None, 
+        default=None,
         sa_column=Column(JSON),
         description="Meta data as JSON, may be NULL."
     )

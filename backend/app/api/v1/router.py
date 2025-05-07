@@ -1,8 +1,10 @@
+"""
+Router for API v1
+"""
 from fastapi import APIRouter
 from app.api.v1.endpoints import chat
 from app.api.v1.endpoints import auth
 from app.api.v1.endpoints import benchmark
-
 
 api_router_v1 = APIRouter()
 

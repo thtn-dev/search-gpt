@@ -1,3 +1,4 @@
+# pylint: skip-file
 from typing import List, Generator, Any
 from google import genai
 from google.genai.types import Part, Content

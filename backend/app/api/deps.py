@@ -1,9 +1,9 @@
+"""
+Dependency injection for FastAPI routes.
+"""
 from typing import Annotated
-
 from fastapi import Depends
-from sqlmodel import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from app.database.session import get_async_session
 
-from app.database.session import get_db
-
-
-SessionDep = Annotated[Session, Depends(get_db)]
+SessionDep = Annotated[AsyncSession, Depends(get_async_session)]

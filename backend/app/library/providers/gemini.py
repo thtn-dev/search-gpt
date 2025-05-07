@@ -1,3 +1,4 @@
+# pylint: skip-file
 from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, HarmCategory
 from pydantic import BaseModel
 from typing import Dict, List
@@ -63,4 +64,4 @@ def load_gemini_chat_models() -> Dict[str, ChatModel]:
             chat_models[model.key] = chat_model
         return chat_models
     except Exception as e:
-        raise ValueError(f"Failed to load Gemini chat models: {e}")
+        raise ValueError(f"Failed to load Gemini chat models: {e}") from e
