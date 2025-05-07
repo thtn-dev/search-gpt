@@ -7,9 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Sử dụng các phiên bản Python bạn muốn hỗ trợ, đảm bảo > 3.12.2
-        # setup-python sẽ chọn bản vá mới nhất cho các phiên bản này.
-        # Ví dụ: "3.12" có thể cài đặt 3.12.4 (nếu là bản mới nhất)
         python-version: ["3.12", "3.13"]
     steps:
     - name: Checkout code
@@ -19,27 +16,42 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'poetry' # Kích hoạt caching cho Poetry
+        # 'cache: poetry' vẫn hữu ích ở đây. Nó sẽ thiết lập cấu hình cache của Poetry
+        # (ví dụ: virtualenvs.in-project=true) và quản lý việc cache các gói phụ thuộc.
+        cache: 'poetry'
 
-    # setup-python với cache: 'poetry' sẽ tự động cài đặt Poetry nếu chưa có.
-    # Nếu bạn cần một phiên bản Poetry cụ thể hoặc cách cài đặt khác, bạn có thể thêm bước riêng ở đây.
-    # Ví dụ:
-    # - name: Install specific Poetry version
-    #   run: pipx install poetry==<phiên_bản_mong_muốn>
+    - name: Install Poetry explicitly
+      shell: bash # Đảm bảo sử dụng bash cho các lệnh này
+      run: |
+        echo "Attempting to install Poetry..."
+        # Cập nhật pip và cài đặt pipx vào thư mục user
+        python -m pip install --user --upgrade pip
+        python -m pip install --user pipx
+        
+        # Đảm bảo đường dẫn của pipx được thêm vào PATH (cho lệnh pipx tiếp theo)
+        # Mặc dù pipx ensurepath cố gắng làm điều này, việc thêm vào GITHUB_PATH rõ ràng hơn cho CI
+        # $HOME/.local/bin là nơi pipx thường cài đặt các ứng dụng
+        export PATH="$HOME/.local/bin:$PATH"
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        
+        # Cài đặt Poetry bằng pipx
+        python -m pipx install poetry
+        
+        # Thêm một lần nữa để chắc chắn, vì pipx install có thể là lần đầu tiên tạo ra thư mục
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        echo "Poetry installation attempt finished."
+
+    - name: Verify Poetry installation and PATH
+      shell: bash
+      run: |
+        echo "Current PATH: $PATH"
+        which poetry
+        poetry --version
 
     - name: Install dependencies with Poetry
-      working-directory: ./backend # Chỉ định thư mục làm việc là 'backend'
-      run: |
-        # --no-interaction: không hỏi tương tác
-        # --no-ansi: không dùng màu sắc/ký tự đặc biệt trong output
-        # --sync: đảm bảo môi trường ảo khớp chính xác với file lock, xóa các gói không cần thiết
-        poetry install --no-interaction --no-ansi --sync
+      working-directory: ./backend
+      run: poetry install --no-interaction --no-ansi --sync
 
     - name: Run Pylint
-      working-directory: ./backend # Chỉ định thư mục làm việc là 'backend'
-      run: |
-        # Chạy pylint thông qua poetry
-        # git ls-files '*.py' sẽ liệt kê các file .py được Git theo dõi trong thư mục hiện tại (backend)
-        poetry run pylint $(git ls-files '*.py')
-        # Một lựa chọn khác, nếu Pylint được cấu hình để tự tìm file trong thư mục hiện tại:
-        # poetry run pylint .
+      working-directory: ./backend
+      run: poetry run pylint $(git ls-files '*.py')
