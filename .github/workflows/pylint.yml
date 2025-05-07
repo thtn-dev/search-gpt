@@ -7,7 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.12", "3.13"] # Hoặc các phiên bản bạn muốn
+    defaults:
+      run:
+        shell: bash # Đảm bảo sử dụng bash cho các lệnh run
+        
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -16,42 +20,64 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        # 'cache: poetry' vẫn hữu ích ở đây. Nó sẽ thiết lập cấu hình cache của Poetry
-        # (ví dụ: virtualenvs.in-project=true) và quản lý việc cache các gói phụ thuộc.
-        cache: 'poetry'
+        # Không sử dụng 'cache: poetry' ở đây nữa để tránh xung đột
+        # chúng ta sẽ quản lý việc cài đặt và cache Poetry thủ công.
 
-    - name: Install Poetry explicitly
-      shell: bash # Đảm bảo sử dụng bash cho các lệnh này
+    - name: Install Poetry
       run: |
-        echo "Attempting to install Poetry..."
-        # Cập nhật pip và cài đặt pipx vào thư mục user
+        echo "Starting explicit Poetry installation..."
         python -m pip install --user --upgrade pip
         python -m pip install --user pipx
         
-        # Đảm bảo đường dẫn của pipx được thêm vào PATH (cho lệnh pipx tiếp theo)
-        # Mặc dù pipx ensurepath cố gắng làm điều này, việc thêm vào GITHUB_PATH rõ ràng hơn cho CI
+        # Thêm thư mục bin của user vào PATH cho bước hiện tại và các bước sau
         # $HOME/.local/bin là nơi pipx thường cài đặt các ứng dụng
-        export PATH="$HOME/.local/bin:$PATH"
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        USER_BIN_PATH="$HOME/.local/bin"
+        export PATH="$USER_BIN_PATH:$PATH"
+        echo "$USER_BIN_PATH" >> $GITHUB_PATH
         
-        # Cài đặt Poetry bằng pipx
         python -m pipx install poetry
         
-        # Thêm một lần nữa để chắc chắn, vì pipx install có thể là lần đầu tiên tạo ra thư mục
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
+        # Đảm bảo một lần nữa rằng đường dẫn chứa poetry (sau khi pipx install) nằm trong GITHUB_PATH
+        # Điều này quan trọng nếu pipx install poetry là lần đầu tiên thư mục $HOME/.local/bin được tạo ra
+        # hoặc nếu poetry được cài vào một sub-directory cụ thể bởi pipx (thường thì không)
+        echo "$USER_BIN_PATH" >> $GITHUB_PATH 
         echo "Poetry installation attempt finished."
 
     - name: Verify Poetry installation and PATH
-      shell: bash
       run: |
-        echo "Current PATH: $PATH"
+        echo "Current PATH is: $PATH"
+        echo "Checking for poetry executable..."
         which poetry
         poetry --version
+        echo "Poetry verified."
+
+    - name: Configure Poetry to create venv in project
+      # Chạy lệnh này trong thư mục backend nếu file pyproject.toml của bạn ở đó
+      # và bạn muốn file poetry.toml (chứa config local) được tạo/cập nhật ở đó.
+      working-directory: ./backend 
+      run: |
+        poetry config virtualenvs.in-project true --local
+
+    - name: Cache Poetry virtual environment
+      uses: actions/cache@v4
+      id: poetry-cache # Đặt ID để có thể kiểm tra cache hit status nếu cần
+      with:
+        # Đường dẫn đến thư mục virtualenv của Poetry.
+        # Với 'virtualenvs.in-project true', nó sẽ là .venv trong thư mục dự án.
+        path: ./backend/.venv 
+        key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-${{ matrix.python-version }}-
 
     - name: Install dependencies with Poetry
       working-directory: ./backend
-      run: poetry install --no-interaction --no-ansi --sync
+      run: |
+        # Nếu cache được phục hồi thành công, lệnh install này sẽ nhanh hơn nhiều
+        # hoặc không cần làm gì nếu .venv đã đầy đủ.
+        poetry install --no-interaction --no-ansi --sync
+        echo "Dependencies installed."
 
     - name: Run Pylint
       working-directory: ./backend
-      run: poetry run pylint $(git ls-files '*.py')
+      run: |
+        poetry run pylint $(git ls-files '*.py')
