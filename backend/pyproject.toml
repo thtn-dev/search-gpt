@@ -39,5 +39,8 @@ start = "uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
 [tool.poetry.group.dev.dependencies]
 pylint = "^3.3.7"
 
+[tool.pylint.main]
+ignore = ["migrations", "venv", ".venv"]
+
 [tool.poetry]
 package-mode = false
