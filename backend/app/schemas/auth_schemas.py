@@ -1,12 +1,16 @@
-from pydantic import BaseModel, EmailStr, HttpUrl
+"""Pydantic schemas for authentication-related data, including OAuth providers and payloads."""
 from enum import Enum
-import uuid
+from typing import Optional # Added Optional for type hinting consistency
+
+from pydantic import BaseModel, EmailStr, HttpUrl
+
 
 class AuthProvider(str, Enum):
     """Enum for supported authentication providers."""
     GOOGLE = "google"
     GITHUB = "github"
-    MICROSOFT = "azure-ad" # Corresponds to azure-ad in NextAuth
+    MICROSOFT = "azure-ad"  # Corresponds to azure-ad in NextAuth
+
 
 class NextAuthSigninPayload(BaseModel):
     """
@@ -14,13 +18,14 @@ class NextAuthSigninPayload(BaseModel):
     Contains token based on the provider.
     """
     provider: AuthProvider
-    id_token: str | None = None      # Provided by Google, Microsoft (Azure AD)
-    access_token: str | None = None
+    id_token: Optional[str] = None      # Provided by Google, Microsoft (Azure AD)
+    access_token: Optional[str] = None  # Provided by GitHub, and sometimes others
+
 
 class VerifiedUserData(BaseModel):
-    """Standardized user info extracted after successful verification"""
+    """Standardized user info extracted after successful verification with an OAuth provider."""
     provider: AuthProvider
-    provider_key: str # ID duy nhất của user từ provider (Google sub, GitHub id, MS oid)
-    email: EmailStr | None = None
-    name: str | None = None
-    picture: HttpUrl | None = None
+    provider_key: str  # Unique user ID from the provider (e.g., Google sub, GitHub id, MS oid)
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+    picture: Optional[HttpUrl] = None

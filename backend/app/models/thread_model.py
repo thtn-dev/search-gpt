@@ -1,7 +1,8 @@
-from sqlmodel import SQLModel, Field
+# pylint: disable=missing-module-docstring
 from typing import  Optional
 from datetime import datetime, timezone
 import uuid
+from sqlmodel import SQLModel, Field
 from app.utils.uuid6 import uuid6
 class ThreadBase(SQLModel):
     title: str = Field(default=None, index=True)

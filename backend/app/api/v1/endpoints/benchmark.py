@@ -1,12 +1,15 @@
+"""Endpoints for benchmarking JSON response performance."""
 import random
 import string
-from fastapi.responses import JSONResponse, ORJSONResponse
+from fastapi.responses import ORJSONResponse
 from fastapi import APIRouter
 
-def generate_random_string(length=10):
-    return ''.join(random.choice(string.ascii_letters) for i in range(length))
+def generate_random_string(length: int = 10) -> str:
+    """Generates a random string of a given length."""
+    return ''.join(random.choice(string.ascii_letters) for _ in range(length))
 
-def create_sample_data(num_records=1000):
+def create_sample_data(num_records: int = 1000) -> list[dict]:
+    """Creates a list of sample data records."""
     data = []
     for i in range(num_records):
         record = {
@@ -28,10 +31,13 @@ def create_sample_data(num_records=1000):
 constant_large_sample_data = create_sample_data(num_records=10)
 
 router = APIRouter()
+
 @router.get("/data-default")
-async def get_data_default():
+async def get_data_default() -> list[dict]:
+    """Returns sample data using the default FastAPI JSONResponse."""
     return constant_large_sample_data
 
 @router.get("/data-orjson", response_class=ORJSONResponse)
-async def get_data_orjson():
+async def get_data_orjson() -> list[dict]:
+    """Returns sample data using ORJSONResponse for potentially faster serialization."""
     return constant_large_sample_data

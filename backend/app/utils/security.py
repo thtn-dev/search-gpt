@@ -1,4 +1,6 @@
-# Sử dụng passlib
+"""
+Module: Security
+"""
 from passlib.context import CryptContext
 
 # Tạo context cho password hashing

@@ -1,11 +1,16 @@
+# pylint: disable=C0103
+"""Mapping utility for converting SQLModel instances to Pydantic schemas."""
+
 from typing import TypeVar
 from pydantic import BaseModel
 from sqlmodel import SQLModel
 
+TSchema = TypeVar("TSchema", bound=BaseModel)
+TModel = TypeVar("TModel", bound=SQLModel)
 
-SchemaType = TypeVar("SchemaType", bound=BaseModel)
-ModelType = TypeVar("ModelType", bound=SQLModel)
 
-
-def map_models_schema(schema: SchemaType, models: list[ModelType]):
+def map_models_schema(schema: TSchema, models: list[TModel]):
+    """
+    Map SQLModel to Pydantic schema.
+    """
     return [schema.model_validate(model) for model in models]

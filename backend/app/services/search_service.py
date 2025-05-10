@@ -1,3 +1,4 @@
+# pylint: skip-file
 regex = '### \[(?<title>.*?)\!\[\].*?\]\((?<url>https?:\/\/.*?)\)'
 class SearchService:
     def get_search_url(self, query: str) -> list[str]:

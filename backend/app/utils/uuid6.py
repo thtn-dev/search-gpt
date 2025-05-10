@@ -1,3 +1,4 @@
+# pylint: skip-file
 r"""UUID draft version objects (universally unique identifiers).
 This module provides the functions uuid6() and uuid7() for
 generating version 6 and 7 UUIDs as specified in

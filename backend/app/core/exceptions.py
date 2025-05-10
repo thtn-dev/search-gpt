@@ -22,7 +22,7 @@ def handle_gemini_exceptions(func):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
-            raise GeminiAPIException(str(e))
+            raise GeminiAPIException(str(e)) from e
     return wrapper
 
 async def gemini_exception_handler(request: Request):
@@ -31,4 +31,4 @@ async def gemini_exception_handler(request: Request):
     try:
         yield
     except Exception as e:
-        raise GeminiAPIException(str(e))
+        raise GeminiAPIException(str(e)) from e
