@@ -25,14 +25,14 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 export const Thread: FC = () => {
   return (
     <ThreadPrimitive.Root
-      className="bg-background box-border h-full flex flex-col overflow-hidden"
+      className="bg-background box-border flex h-full flex-col overflow-hidden"
       style={{
         ["--thread-max-width" as string]: "42rem",
       }}
     >
       <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
         <ThreadWelcome />
-        
+
         <ThreadPrimitive.Messages
           components={{
             UserMessage: UserMessage,
@@ -73,7 +73,9 @@ const ThreadWelcome: FC = () => {
     <ThreadPrimitive.Empty>
       <div className="flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
         <div className="flex w-full flex-grow flex-col items-center justify-center">
-          <p className="mt-4 font-medium">How can I help you today?</p>
+          <p className="mt-4 font-medium">
+            How can I help you today?
+          </p>
         </div>
         <ThreadWelcomeSuggestions />
       </div>
@@ -220,20 +222,6 @@ const AssistantActionBar: FC = () => {
       autohideFloat="single-branch"
       className="text-muted-foreground flex gap-1 col-start-3 row-start-2 -ml-1 data-[floating]:bg-background data-[floating]:absolute data-[floating]:rounded-md data-[floating]:border data-[floating]:p-1 data-[floating]:shadow-sm"
     >
-      {/* <MessagePrimitive.If speaking={false}>
-        <ActionBarPrimitive.Speak asChild>
-          <TooltipIconButton tooltip="Read aloud">
-            <AudioLinesIcon />
-          </TooltipIconButton>
-        </ActionBarPrimitive.Speak>
-      </MessagePrimitive.If>
-      <MessagePrimitive.If speaking>
-        <ActionBarPrimitive.StopSpeaking asChild>
-          <TooltipIconButton tooltip="Stop">
-            <StopCircleIcon />
-          </TooltipIconButton>
-        </ActionBarPrimitive.StopSpeaking>
-      </MessagePrimitive.If> */}
       <ActionBarPrimitive.Copy asChild>
         <TooltipIconButton tooltip="Copy">
           <MessagePrimitive.If copied>
@@ -260,10 +248,7 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
   return (
     <BranchPickerPrimitive.Root
       hideWhenSingleBranch
-      className={cn(
-        "text-muted-foreground inline-flex items-center text-xs",
-        className
-      )}
+      className={cn("text-muted-foreground inline-flex items-center text-xs", className)}
       {...rest}
     >
       <BranchPickerPrimitive.Previous asChild>
