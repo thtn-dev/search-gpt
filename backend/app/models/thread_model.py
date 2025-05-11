@@ -1,12 +1,12 @@
 # pylint: disable=missing-module-docstring
 from typing import  Optional
-from datetime import datetime, timezone
+from datetime import datetime
 import uuid
 from sqlmodel import SQLModel, Field
 from app.utils.uuid6 import uuid6
 class ThreadBase(SQLModel):
     title: str = Field(default=None, index=True)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=datetime.utcnow)
     user_id: Optional[int] = Field(default=None, index=True)
 
 class ThreadModel(ThreadBase, table=True):

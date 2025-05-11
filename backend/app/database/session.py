@@ -2,6 +2,7 @@
 Database session management for async operations.
 """
 from typing import AsyncGenerator
+from fastapi.concurrency import asynccontextmanager
 from sqlalchemy import AsyncAdaptedQueuePool
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -31,9 +32,23 @@ AsyncSessionLocal = sessionmaker(
 )
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    """Create and manage Async Session with Context Manager"""
+    """Dependency to get an AsyncSession."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
         finally:
             await session.close()
+            
+
+@asynccontextmanager
+async def get_async_ctx_session() -> AsyncGenerator[AsyncSession, None]:
+    """Context manager to get an AsyncSession."""
+    async_session = AsyncSessionLocal()
+    try:
+        yield async_session
+        # Không commit ở đây, để logic nghiệp vụ tự commit
+    except Exception:
+        await async_session.rollback()
+        raise
+    finally:
+        await async_session.close()
