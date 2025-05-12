@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from typing import AsyncGenerator, List, Union, Callable # Thêm Callable
-import uuid # Cần cho chuyển đổi thread_id
 
 import orjson
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
@@ -266,7 +265,7 @@ async def chat_stream_endpoint(
 async def health_check():
     return {"status": "healthy"}
 
-@router.get("/threads", status_code=status.HTTP_200_OK)
+@router.get("/threads2", status_code=status.HTTP_200_OK)
 async def get_threads_endpoint(
     crud: ChatCRUD = Depends(ChatCRUD),
     current_user = Depends(get_current_user), 
@@ -285,7 +284,7 @@ async def get_threads_endpoint(
         )
 
 
-@router.get("/{thread_id}", status_code=status.HTTP_200_OK)
+@router.get("/th/{thread_id}", status_code=status.HTTP_200_OK)
 async def get_thread_messages_endpoint(
     thread_id: str,
     crud: ChatCRUD = Depends(ChatCRUD),
