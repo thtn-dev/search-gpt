@@ -1,6 +1,7 @@
 """SQLModel definitions for User and LinkedAccount entities."""
 from datetime import datetime
 from typing import List, Optional
+import uuid
 
 from pydantic import EmailStr
 from sqlmodel import (
@@ -12,6 +13,8 @@ from sqlmodel import (
     SQLModel,
     UniqueConstraint,
 )
+
+from app.utils.uuid6 import uuid6
 
 
 class UserBase(SQLModel):
@@ -29,7 +32,7 @@ class UserBase(SQLModel):
 class UserModel(UserBase, table=True):
     """Database model for users."""
     __tablename__ = "users"
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
 
     linked_accounts: List["LinkedAccountModel"] = Relationship(
         back_populates="user",
@@ -40,9 +43,11 @@ class UserModel(UserBase, table=True):
 class LinkedAccountModel(SQLModel, table=True):
     """Database model for linking external OAuth provider accounts to a user."""
     __tablename__ = "linked_accounts"
-    id: Optional[int] = Field(default=None, primary_key=True)
-    user_id: int = Field(
-        sa_column=Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    user_id: uuid.UUID = Field(
+        sa_column=Column(
+            ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+        )
     )
     provider: str = Field(max_length=50, nullable=False) # e.g., "google", "github"
     provider_key: str = Field(max_length=255, nullable=False) # User's unique ID from the provider

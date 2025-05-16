@@ -142,10 +142,10 @@ def _prepare_langchain_messages(request: MessageRequest) -> List[Union[HumanMess
         logger.debug("No System Message provided.")
 
     for role, hist_content in request.history: # Đổi tên biến content để tránh trùng
-        if role == MessageRole.HUMAN:
+        if role == MessageRole.USER:
             messages.append(HumanMessage(content=hist_content))
             logger.debug(f"Added History (Human): {hist_content[:100]}...")
-        elif role == MessageRole.AI:
+        elif role == MessageRole.ASSISTANT:
             messages.append(AIMessage(content=hist_content))
             logger.debug(f"Added History (AI): {hist_content[:100]}...")
         else:

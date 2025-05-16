@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 import uuid
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Body, Response, status
 from pydantic import BaseModel, Field, field_validator
 
 from app.schemas.thread_schema import CreateThreadRequestSchema, CreateThreadResponseSchema, RequestCreateMessageSchema, ResponseCreateMessageSchema, ThreadSchema, ThreadsResponse
@@ -25,9 +25,6 @@ async def create_thread(
     Get all threads.
     """
     return CreateThreadResponseSchema(thread_id= str(uuid.uuid4()))
-
-
-    
 
 @router.post("/threads/{thread_id}/messages", response_model=ResponseCreateMessageSchema)
 async def create_message(

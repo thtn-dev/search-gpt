@@ -109,7 +109,7 @@ class ChatCRUD:
                 content=content,
                 thread_id=uuid_thread_id,
                 message_id=ai_message_id,
-                role=MessageRole.AI,
+                role=MessageRole.ASSISTANT,
             )
             
             await self.session.commit() # Commit transaction
@@ -197,7 +197,7 @@ class ChatCRUD:
             content=request_message.message,
             thread_id=final_thread_id,
             message_id=human_message_id,
-            role=MessageRole.HUMAN,
+            role=MessageRole.USER,
             message_metadata=None
         )
 

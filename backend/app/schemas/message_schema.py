@@ -35,8 +35,8 @@ class MessageRequest(BaseModel):
             "example": {
                 "message": "Xin chào, bạn có thể giúp tôi không?",
                 "history": [
-                    (MessageRole.HUMAN, "Tôi cần thông tin về sản phẩm X."),
-                    (MessageRole.AI, "Chào bạn, sản phẩm X có các tính năng A, B, C.")
+                    (MessageRole.USER, "Tôi cần thông tin về sản phẩm X."),
+                    (MessageRole.ASSISTANT, "Chào bạn, sản phẩm X có các tính năng A, B, C.")
                 ],
                 "thread_id": "a1b2c3d4-e5f6-7890-1234-567890abcdef",
                 "system_instructions": "Hãy trả lời một cách thân thiện và chuyên nghiệp.",
