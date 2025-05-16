@@ -12,10 +12,21 @@ class MessageRole(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
 
+class Usage(BaseModel):
+    prompt_tokens: Optional[int] = None
+    completion_tokens: Optional[int] = None
+
+class Step(BaseModel):
+    state: str
+    message_id: str
+    finishReason: str
+    isContinued: bool = False
+    usage: Optional[Usage] = None
+
 class ContentMetadata(BaseModel):
     unstable_annotations: Optional[List[Any]] = None
     unstable_data: Optional[List[Any]] = None
-    steps: Optional[Dict[str, Any]] = None
+    steps: Optional[List[Step]] = None
     custom: Optional[Dict[str, Any]] = None
 
 class ContentStatus(BaseModel):
