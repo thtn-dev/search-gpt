@@ -5,14 +5,14 @@ import uuid
 from sqlmodel import JSON, Column, SQLModel, Field
 from app.utils.uuid6 import uuid6
 class ThreadBase(SQLModel):
-    title: str = Field(default=None, index=True)
+    title: str = Field(default=None, index=False)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    user_id: Optional[int] = Field(default=None, index=True)
     created_by: Optional[str] = Field(default=None, index=True)
     updated_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     last_message_at: datetime = Field(default_factory=datetime.utcnow, index=True)
     is_archived: bool = Field(default=False, index=True)
     external_id: Optional[str] = Field(default=None, index=True)
+    workspace_id: Optional[str] = Field(default=None, index=True)
     thread_metadata: Optional[Dict[str, Any]] = Field(
         default=None,
         sa_column=Column(JSON),
