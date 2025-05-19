@@ -6,14 +6,15 @@ import uuid
 from pydantic import EmailStr
 from sqlmodel import (
     Column,
+    DateTime,
     Field,
     ForeignKey,
-    Integer,
     Relationship,
     SQLModel,
     UniqueConstraint,
 )
 
+from app.utils.datetime_utils import utc_now
 from app.utils.uuid6 import uuid6
 
 
@@ -21,12 +22,23 @@ class UserBase(SQLModel):
     """Base model for user attributes, shared between creation and read models."""
     username: Optional[str] = Field(
         default=None, index=True, unique=True, max_length=50, nullable=True
-    ) # Username can be optional if email is primary identifier
+    ) 
+    
     email: EmailStr = Field(index=True, unique=True, nullable=False)
-    hashed_password: Optional[str] = Field(default=None, nullable=True) # Nullable for social logins
+    
+    hashed_password: Optional[str] = Field(default=None, nullable=True) 
+    
     is_active: bool = Field(default=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    
+    created_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), index=True)
+    )
+    
+    updated_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), index=True)
+    )
 
 
 class UserModel(UserBase, table=True):
@@ -43,16 +55,27 @@ class UserModel(UserBase, table=True):
 class LinkedAccountModel(SQLModel, table=True):
     """Database model for linking external OAuth provider accounts to a user."""
     __tablename__ = "linked_accounts"
+    
     id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    
     user_id: uuid.UUID = Field(
         sa_column=Column(
             ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
         )
     )
-    provider: str = Field(max_length=50, nullable=False) # e.g., "google", "github"
-    provider_key: str = Field(max_length=255, nullable=False) # User's unique ID from the provider
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    
+    provider: str = Field(max_length=50, nullable=False) 
+    
+    provider_key: str = Field(max_length=255, nullable=False) 
+    created_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), index=True)
+    )
+    
+    updated_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), index=True)
+    )
 
     user: Optional[UserModel] = Relationship(back_populates="linked_accounts")
 

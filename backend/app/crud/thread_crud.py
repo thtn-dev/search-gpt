@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database.session import get_async_session
@@ -27,7 +28,7 @@ class ThreadCRUD:
         """Provides access to the database session."""
         return self._db
     
-    async def create_thread(self, user_id: str, workspace_id: str, last_message_at: datetime) -> dict:
+    async def create_thread(self, user_id: str, workspace_id: str, last_message_at: datetime) -> UUID:
         """
         Creates a new thread in the database.
 
@@ -40,7 +41,7 @@ class ThreadCRUD:
         """
         
         new_thread = ThreadModel(
-            title=None,
+            title="",
             created_by=user_id,
             workspace_id=workspace_id,
             last_message_at=last_message_at,
@@ -49,8 +50,9 @@ class ThreadCRUD:
             thread_metadata=None,
         )
         self.session.add(new_thread)
+        await self.session.flush()
         await self.session.commit()
         await self.session.refresh(new_thread)
-        return new_thread
+        return new_thread.id
     
         

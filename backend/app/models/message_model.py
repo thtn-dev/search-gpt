@@ -1,12 +1,12 @@
 import uuid
 from pydantic import BaseModel
-from sqlmodel import JSON, Column, SQLModel, Field, String
+from sqlmodel import  Column, DateTime, SQLModel, Field
 from typing import Any, Dict, List, Optional
 from datetime import datetime
+from app.utils.datetime_utils import utc_now
 from app.utils.uuid6 import uuid6
 from enum import Enum
 from sqlalchemy import types
-import json
 
 class MessageRole(str, Enum):
     USER = "user"
@@ -61,19 +61,35 @@ class ContentType(types.TypeDecorator):
 
 class MessageBase(SQLModel):
     content: str = Field()
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    created_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), index=True)
+    )
+    
     thread_id: Optional[uuid.UUID] = Field(default=None, index=True)
+    
     message_id: Optional[str] = Field(default=None, index=True)
+    
     parent_id: Optional[str] = Field(default=None, index=True)
+    
     created_by: Optional[str] = Field(default=None, index=True)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+    
+    updated_at: datetime = Field(
+        default_factory=utc_now,
+        sa_column=Column(DateTime(timezone=True), index=True)
+    )
+    
     updated_by: Optional[str] = Field(default=None, index=None)
+    
     format: str = Field()
+    
     content: Optional[Content] = Field(
         default=None,
-        sa_column=Column(ContentType),  # Use custom type
+        sa_column=Column(ContentType),
         description="Content as JSON, may be NULL."
     )
+    
     height: int = Field(default=0)
 
 class MessageModel(MessageBase, table=True):

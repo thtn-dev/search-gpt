@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_ID: str
     MICROSOFT_TENANT_ID: str
     MICROSOFT_CLIENT_ID: str
-
+    OPENAI_API_KEY: str
     class Config:
         """Pydantic model configuration."""
         env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
