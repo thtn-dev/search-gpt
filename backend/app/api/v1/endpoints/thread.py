@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Literal, Optional, Union
 import uuid
+from app.crud.message_crud import MessageCRUD
 from fastapi import APIRouter, Body, Depends, Response, status
 from pydantic import BaseModel, Field, field_validator
 
@@ -33,15 +34,21 @@ async def create_thread(
 async def create_message(
     thread_id: str,
     request: RequestCreateMessageSchema = Body(...),
+    message_crud: MessageCRUD = Depends(MessageCRUD),
 ) -> ResponseCreateMessageSchema:
     """
     Tạo một tin nhắn mới trong một chủ đề cụ thể.
     """
     # Xử lý logic tạo tin nhắn ở đây
     # ...
-    
+    print(request)
+    message_id = await message_crud.create_user_message(
+        thread_id=thread_id,
+        user_id=str(uuid.uuid4()),
+        data=request,
+    )
     # Trả về phản hồi
-    return ResponseCreateMessageSchema(message_id=str(uuid.uuid4()))
+    return ResponseCreateMessageSchema(message_id=str(message_id))
 
 
 

@@ -21,7 +21,27 @@ class CreateThreadResponseSchema(BaseModel):
     """
     thread_id: str
     
-    
+class Usage(BaseModel):
+    promptTokens: Optional[int] = None
+    completionTokens: Optional[int] = None
+
+class Step(BaseModel):
+    state: Optional[str] = None
+    messageId: Optional[str] = None
+    finishReason: Optional[str] = None
+    isContinued: bool = False
+    usage: Optional[Usage] = None
+
+class ContentMetadata(BaseModel):
+    unstable_annotations: List[Any] | None = None
+    unstable_data: List[Any] | None = None
+    steps: List[Step] | None = None
+    custom: Dict[str, Any] | None = None
+
+class ContentStatus(BaseModel):
+    type: str | None = None
+    reason: str | None = None
+
 class ContentItem(BaseModel):
     """
     Đại diện cho một mục nội dung, ví dụ như một đoạn văn bản.
@@ -36,6 +56,8 @@ class Content(BaseModel):
     """
     role: str
     content: List[ContentItem]
+    metadata: Optional[ContentMetadata] = None
+    status: Optional[ContentStatus] = None
 
 # Định nghĩa schema chính cho toàn bộ request (CẬP NHẬT TRƯỜNG METADATA)
 class RequestCreateMessageSchema(BaseModel):
@@ -47,7 +69,6 @@ class RequestCreateMessageSchema(BaseModel):
     format: str
     content: Content
     # metadata giờ là một dictionary động, chấp nhận bất kỳ key-value nào
-    metadata: Dict[str, Any] = Field(default_factory=dict)
     
 class ResponseCreateMessageSchema(BaseModel):
     """

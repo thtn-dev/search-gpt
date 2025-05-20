@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlmodel import  Column, DateTime, SQLModel, Field
 from typing import Any, Dict, List, Optional
 from datetime import datetime
+from app.schemas.thread_schema import ContentItem, ContentMetadata, ContentStatus
 from app.utils.datetime_utils import utc_now
 from app.utils.uuid6 import uuid6
 from enum import Enum
@@ -12,49 +13,30 @@ class MessageRole(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
 
-class Usage(BaseModel):
-    prompt_tokens: Optional[int] = None
-    completion_tokens: Optional[int] = None
 
-class Step(BaseModel):
-    state: str
-    message_id: str
-    finishReason: str
-    isContinued: bool = False
-    usage: Optional[Usage] = None
-
-class ContentMetadata(BaseModel):
-    unstable_annotations: Optional[List[Any]] = None
-    unstable_data: Optional[List[Any]] = None
-    steps: Optional[List[Step]] = None
-    custom: Optional[Dict[str, Any]] = None
-
-class ContentStatus(BaseModel):
-    type: Optional[str] = None
-    reason: Optional[str] = None
 
 class Content(BaseModel):  # Pydantic model, not SQLModel
     role: Optional[MessageRole] = None
-    content: Optional[List[Dict[str, Any]]] = None
+    content: List[ContentItem]
     metadata: Optional[ContentMetadata] = None
     status: Optional[ContentStatus] = None
     
     # Add method to convert to dict for storage
     def to_json(self):
-        return self.model_dump(exclude_none=True)
+        return self.model_dump()
 
 # Custom SQLAlchemy type for Content objects
 class ContentType(types.TypeDecorator):
     impl = types.JSON
 
-    def process_bind_param(self, value):
+    def process_bind_param(self, value, dialect):
         if value is None:
             return None
         if isinstance(value, Content):
             return value.to_json()
         return value
     
-    def process_result_value(self, value):
+    def process_result_value(self, value, dialect):
         if value is None:
             return None
         return Content(**value)
