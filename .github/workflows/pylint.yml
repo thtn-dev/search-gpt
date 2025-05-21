@@ -1,6 +1,14 @@
 name: Backend Pylint
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - ci
+  pull_request:
+    branches:
+      - main
+      - ci
 
 jobs:
   lint-backend:
