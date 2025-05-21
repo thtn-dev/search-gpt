@@ -42,7 +42,6 @@ class ContentType(types.TypeDecorator):
         return Content(**value)
 
 class MessageBase(SQLModel):
-    content: str = Field()
     
     created_at: datetime = Field(
         default_factory=utc_now,
