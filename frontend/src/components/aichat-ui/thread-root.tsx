@@ -2,6 +2,7 @@
 import * as React from "react";
 import Chat from "./chat";
 import { Message } from "@/schemas/chat-schema";
+import { MessageInput } from "./message-input";
 
 interface Props {
   threadId?: string;
@@ -161,7 +162,7 @@ console.log(getUserInfo(currentUser));
   };
 
   return (
-    <section className="thread-container">
+    <section className="thread-container relative">
       {/* Test button to add another code example */}
       <button onClick={addCustomCodeMessage} className="add-message-btn">
         Add Another Code Example
@@ -174,6 +175,7 @@ console.log(getUserInfo(currentUser));
 
       {/* Show the currently streaming message */}
       {currentMessage && <Chat message={currentMessage} isTyping={isTyping} />}
+      <MessageInput className="absolute" onSendMessage={() => {}} />
     </section>
   );
 }

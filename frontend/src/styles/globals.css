@@ -81,159 +81,98 @@
   }
 }
 
-.thread-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.chat-message {
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  animation: fadeIn 0.3s ease-in-out;
-  position: relative;
-  line-height: 1.5;
-}
-
-.typing-indicator {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 8px;
-}
-
-.typing-indicator .dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #888;
-  margin-right: 4px;
-  animation: bounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator .dot:nth-child(1) {
-  animation-delay: 0s;
-}
-
-.typing-indicator .dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator .dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-/* Code formatting */
-.code-block-wrapper {
-  margin: 16px 0;
-  border-radius: 4px;
-  overflow: hidden;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-.code-block-header {
-  background-color: #343a40;
-  color: #f8f9fa;
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 500;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.code-language-tag {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #e9ecef;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.inline-code {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 3px;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  padding: 2px 5px;
-  font-size: 0.9em;
-  color: #e83e8c;
-}
-
-/* Button styling */
-.add-message-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.add-message-btn:hover {
-  background-color: #0069d9;
-}
-
-.add-message-btn:active {
-  background-color: #0062cc;
-}
-
-/* Markdown styling */
-.chat-message h1 {
-  margin-top: 0;
-  font-size: 1.5rem;
-  margin-bottom: 16px;
-  color: #333;
-}
-
-.chat-message h2 {
-  font-size: 1.25rem;
-  margin-top: 24px;
-  margin-bottom: 12px;
-  color: #444;
-}
-
-.chat-message p {
-  margin-bottom: 16px;
-}
-
-.chat-message ul, .chat-message ol {
-  margin-bottom: 16px;
-  padding-left: 24px;
-}
-
-.chat-message li {
-  margin-bottom: 4px;
-}
-
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0.6);
-    opacity: 0.6;
+@layer components {
+  /* 1. .thread-container */
+  .thread-container {
+    @apply w-full max-w-4xl mx-auto p-5;
+    /* Tailwind sử dụng max-w-4xl (896px), bạn có thể dùng max-w-[800px] cho chính xác */
+    /* p-5 là 1.25rem (20px nếu 1rem = 16px) */
   }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+  /* 2. .chat-message */
+  .chat-message {
+    @apply bg-gray-100 rounded-lg py-3 px-4 mb-4 relative leading-normal animate-fadeIn;
+    /* animate-fadeIn tham chiếu đến animation đã định nghĩa trong tailwind.config.js */
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  /* 3. .typing-indicator */
+  .typing-indicator {
+    @apply inline-flex items-center ml-2;
+  }
+
+  /* 4. .typing-indicator .dot */
+  .typing-indicator .dot {
+    @apply inline-block w-2 h-2 rounded-full bg-gray-500 mr-1 animate-customBounce;
+    /* animate-customBounce tham chiếu đến animation tùy chỉnh */
+  }
+
+  /* Đối với animation-delay cho các dot cụ thể: */
+  .typing-indicator .dot:nth-child(1) {
+    @apply [animation-delay:0s]; /* Sử dụng cú pháp giá trị tùy ý của Tailwind */
+  }
+  .typing-indicator .dot:nth-child(2) {
+    @apply [animation-delay:0.2s];
+  }
+  .typing-indicator .dot:nth-child(3) {
+    @apply [animation-delay:0.4s];
+  }
+
+  /* 5. .code-block-wrapper */
+  .code-block-wrapper {
+    @apply my-4 rounded overflow-hidden font-mono text-sm shadow-md;
+    /* shadow-md là một giá trị gần đúng, có thể dùng shadow-[0_2px_6px_rgba(0,0,0,0.15)] cho chính xác */
+  }
+
+  /* 6. .code-block-header */
+  .code-block-header {
+    @apply bg-gray-800 text-gray-100 py-2 px-3 text-xs font-medium flex justify-between items-center;
+  }
+
+  /* 7. .code-language-tag */
+  .code-language-tag {
+    @apply bg-white/15 text-gray-200 py-0.5 px-1.5 rounded text-[11px] uppercase tracking-wider;
+    /* py-0.5 (2px), px-1.5 (6px) nếu đã định nghĩa trong config. text-[11px] cho font size chính xác. */
+    /* tracking-wider là 0.05em, có thể dùng tracking-[0.5px] cho chính xác */
+  }
+
+  /* 8. .inline-code */
+  .inline-code {
+    @apply bg-black/5 rounded-sm font-mono py-0.5 px-[5px] text-[0.9em] text-pink-600;
+    /* rounded-sm (2px), dùng rounded-[3px] cho chính xác. */
+    /* py-0.5 (2px), px-[5px] cho chính xác 5px. */
+  }
+
+  /* 9. .add-message-btn */
+  .add-message-btn {
+    @apply bg-blue-500 text-white border-none py-2.5 px-4 rounded cursor-pointer mb-5 text-sm font-medium transition-colors duration-200 hover:bg-blue-600 active:bg-blue-700;
+    /* py-2.5 (10px) nếu đã định nghĩa trong config. */
+    /* Các pseudo-classes như hover:, active: có thể được áp dụng trực tiếp như trên. */
+  }
+
+  /* 10. Markdown Styling (bên trong .chat-message) */
+  /* Cách này hữu ích nếu bạn không muốn dùng plugin @tailwindcss/typography */
+  /* hoặc muốn kiểm soát hoàn toàn style của các thẻ HTML raw */
+  .chat-message h1 {
+    @apply mt-0 text-2xl mb-4 text-gray-800;
+  }
+
+  .chat-message h2 {
+    @apply text-xl mt-6 mb-3 text-gray-700;
+  }
+
+  .chat-message p {
+    @apply mb-4;
+  }
+
+  .chat-message ul {
+    @apply mb-4 pl-6 list-disc; /* Thêm list-disc cho kiểu danh sách */
+  }
+
+  .chat-message ol {
+    @apply mb-4 pl-6 list-decimal; /* Thêm list-decimal cho kiểu danh sách */
+  }
+
+  .chat-message li {
+    @apply mb-1;
   }
 }

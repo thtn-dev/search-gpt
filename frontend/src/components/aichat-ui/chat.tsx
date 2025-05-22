@@ -1,9 +1,9 @@
 "use client";
 import { Message } from "@/schemas/chat-schema";
-import React from "react";
+import React, { Fragment } from "react";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { darcula as theme } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { darcula as theme } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 interface Props extends React.PropsWithChildren {
   message: Message | null;
@@ -11,23 +11,29 @@ interface Props extends React.PropsWithChildren {
 }
 
 // Custom Code component for syntax highlighting
-const CodeBlock = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+const CodeBlock = ({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) => {
   // Extract language from className (format: "language-xxx")
-  const match = /lang-(\w+)/.exec(className || '');
-  const language = match ? match[1] : 'text';
-  
+  const match = /lang-(\w+)/.exec(className || "");
+  const language = match ? match[1] : "text";
+
   return (
     <div className="code-block-wrapper">
       <div className="code-block-header">
         {language && <span className="code-language-tag">{language}</span>}
       </div>
-      <SyntaxHighlighter 
-        language={language} 
+      <SyntaxHighlighter
+        language={language}
         style={theme}
         showLineNumbers
-        customStyle={{ margin: 0, borderRadius: '0 0 4px 4px' }}
+        customStyle={{ margin: 0, borderRadius: "0 0 4px 4px" }}
       >
-        {String(children).replace(/\n$/, '')}
+        {String(children).replace(/\n$/, "")}
       </SyntaxHighlighter>
     </div>
   );
@@ -39,7 +45,9 @@ const InlineCode = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function Chat({ message, isTyping = false }: Props) {
-  const [parsedMessage, setParsedMessage] = React.useState<string | undefined>(message?.content);
+  const [parsedMessage, setParsedMessage] = React.useState<string | undefined>(
+    message?.content
+  );
 
   React.useEffect(() => {
     if (message) {
@@ -51,34 +59,50 @@ export default function Chat({ message, isTyping = false }: Props) {
   const markdownOptions: MarkdownToJSX.Options = {
     overrides: {
       code: {
-        component: InlineCode
+        component: InlineCode,
       },
       pre: {
-        component: ({ children, ...props }: React.ComponentPropsWithoutRef<"pre">) => {
-          if (children && React.isValidElement(children) && typeof children === 'object') {
-            const codeElement = children as React.ReactElement<{ className?: string; children: React.ReactNode }>;
-            return <CodeBlock className={codeElement.props.className}>{codeElement.props.children}</CodeBlock>;
+        component: ({
+          children,
+          ...props
+        }: React.ComponentPropsWithoutRef<"pre">) => {
+          if (
+            children &&
+            React.isValidElement(children) &&
+            typeof children === "object"
+          ) {
+            const codeElement = children as React.ReactElement<{
+              className?: string;
+              children: React.ReactNode;
+            }>;
+            return (
+              <CodeBlock className={codeElement.props.className}>
+                {codeElement.props.children}
+              </CodeBlock>
+            );
           }
           return <pre {...props}>{children}</pre>;
-        }
-      }
-    }
+        },
+      },
+    },
   };
 
   return (
-    <div className="chat-message">
-      {parsedMessage && (
-        <>
-          <Markdown options={markdownOptions}>{parsedMessage}</Markdown>
-          {isTyping && (
-            <span className="typing-indicator">
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-            </span>
-          )}
-        </>
-      )}
-    </div>
+    <Fragment>
+      <div className="chat-message">
+        {parsedMessage && (
+          <>
+            <Markdown options={markdownOptions}>{parsedMessage}</Markdown>
+            {isTyping && (
+              <span className="typing-indicator">
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </span>
+            )}
+          </>
+        )}
+      </div>
+    </Fragment>
   );
 }
