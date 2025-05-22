@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import {  Montserrat, Noto_Sans_Mono } from "next/font/google";
+import {  Inter, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/providers/auth-provider";
 
-const MontserratFont = Montserrat({
-  variable: "--font-montserrat",
+const InterFont = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   // all weights
 });
 
-const NotoSansMono = Noto_Sans_Mono({
-  variable: "--font-noto-sans-mono",
+const JetBrainsMono = JetBrains_Mono({
+  variable: "--font-jet-brains_mono",
   subsets: ["latin"],
 });
 
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${MontserratFont.className} ${NotoSansMono.variable} antialiased`}
+        className={`${InterFont.className} ${JetBrainsMono.variable} antialiased`}
       >
         <AuthProvider>{children}</AuthProvider>
       </body>

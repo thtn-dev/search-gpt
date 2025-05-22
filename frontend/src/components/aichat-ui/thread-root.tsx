@@ -3,6 +3,10 @@ import * as React from "react";
 import Chat from "./chat";
 import { Message } from "@/schemas/chat-schema";
 import { MessageInput } from "./message-input";
+import { ScrollArea } from "../ui/scroll-area";
+import { SidebarInset, SidebarProvider } from "../ui/sidebar";
+import { AppSidebar } from "./sidebar/app-sidebar";
+import ThreadHeader from "./thread-header";
 
 interface Props {
   threadId?: string;
@@ -10,8 +14,8 @@ interface Props {
 
 // Example message with code blocks for demonstration
 const exampleMessage = `
-# Chúc Quỳnh Thương ngủ ngon nhé hihihi
-1. hehe\n
+# Sample Code Snippet
+This is a sample code snippet in a markdown format. You can use \`code\` inline or create code blocks using triple backticks.
 Here's a simple React component:
 
 \`\`\`jsx
@@ -20,19 +24,11 @@ import React from 'react';
 function HelloWorld() {
   return (
     <div className="greeting">
-      <h1>Quỳnh thương đáng yêu</h1>
+      <h1>React</h1>
       <p>Welcome to my React application!</p>
     </div>
   );
 }
-
-export default HelloWorld;
-\`\`\`
-
-\`\`\`python
-def greet(name):
-  return f"Hello, {name}!"
-print(greet("World"))
 \`\`\`
 
 And here's some CSS to style it:
@@ -61,7 +57,7 @@ You can also use inline code like \`const x = 42;\` within your text.
 `;
 
 export function ThreadRoot({ threadId }: Props) {
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [messages] = React.useState<Message[]>([]);
   const [currentMessage, setCurrentMessage] = React.useState<Message | null>(
     null
   );
@@ -108,74 +104,49 @@ export function ThreadRoot({ threadId }: Props) {
       setIsTyping(false);
 
       // Add the complete message to the messages list when done streaming
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: accumulatedContent,
-          createdAt: new Date(),
-          threadId: threadId || "default-thread-id",
-        },
-      ]);
+      // setMessages((prev) => [
+      //   ...prev,
+      //   {
+      //     role: "assistant",
+      //     content: accumulatedContent,
+      //     createdAt: new Date(),
+      //     threadId: threadId || "default-thread-id",
+      //   },
+      // ]);
     };
 
     streamMessage();
   }, [threadId]);
 
-  // Function to add a test message with custom code
-  const addCustomCodeMessage = () => {
-    const customMessage = `
-Here's a TypeScript example:
-
-\`\`\`typescript
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  isActive: boolean;
-}
-
-function getUserInfo(user: User): string {
-  return \`User \${user.name} (\${user.email}) is \${user.isActive ? 'active' : 'inactive'}\`;
-}
-
-const currentUser: User = {
-  id: 1,
-  name: 'John Doe',
-  email: 'john@example.com',
-  isActive: true
-};
-
-console.log(getUserInfo(currentUser));
-\`\`\`
-    `;
-
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        content: customMessage,
-        createdAt: new Date(),
-        threadId: threadId || "default-thread-id",
-      },
-    ]);
-  };
-
   return (
-    <section className="thread-container relative">
-      {/* Test button to add another code example */}
-      <button onClick={addCustomCodeMessage} className="add-message-btn">
-        Add Another Code Example
-      </button>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset className="relative flex flex-col h-screen">
+        <ThreadHeader />
 
-      {/* Show previous messages */}
-      {messages.map((msg, index) => (
-        <Chat key={`msg-${index}`} message={msg} />
-      ))}
+        {/* Main content area - flex-1 để chiếm hết không gian còn lại */}
+        <div className="flex-1 overflow-hidden group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-[calc(100vh-3rem)]">
+          <ScrollArea className="h-full">
+            <section className="w-full max-w-4xl mx-auto p-5">
+              {/* Show previous messages */}
+              {messages.map((msg, index) => (
+                <Chat key={`msg-${index}`} message={msg} />
+              ))}
+              {/* Show the currently streaming message */}
+              {currentMessage && (
+                <Chat message={currentMessage} isTyping={isTyping} />
+              )}
+            </section>
+          </ScrollArea>
+        </div>
 
-      {/* Show the currently streaming message */}
-      {currentMessage && <Chat message={currentMessage} isTyping={isTyping} />}
-      <MessageInput className="absolute" onSendMessage={() => {}} />
-    </section>
+        {/* MessageInput - cố định ở dưới cùng */}
+        <div className="flex-shrink-0 pb-3">
+          <div className="w-full max-w-4xl mx-auto">
+            <MessageInput className="w-full" onSendMessage={() => {}} />
+          </div>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

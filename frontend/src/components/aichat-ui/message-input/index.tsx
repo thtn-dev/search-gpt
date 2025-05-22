@@ -83,7 +83,7 @@ export function MessageInput({
   };
 
   return (
-    <div className={cn("w-full max-w-4xl p-5 mx-auto ", className)}>
+    <div className={cn("w-full", className)}>
       {files.length > 0 && (
         <FileList files={files} onRemoveFile={handleRemoveFile} />
       )}
