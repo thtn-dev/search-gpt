@@ -116,33 +116,21 @@
 }
 
 @layer components {
-  /* 1. .thread-container */
-  .thread-container {
-    @apply w-full max-w-4xl mx-auto p-5;
-    /* Tailwind sử dụng max-w-4xl (896px), bạn có thể dùng max-w-[800px] cho chính xác */
-    /* p-5 là 1.25rem (20px nếu 1rem = 16px) */
-  }
 
-  /* 2. .chat-message */
   .chat-message {
-    @apply bg-zinc-100 rounded-lg py-3 px-4 mb-4 relative leading-normal animate-fadeIn;
-    /* animate-fadeIn tham chiếu đến animation đã định nghĩa trong tailwind.config.js */
+    @apply bg-card rounded-lg py-3 px-4 mb-4 relative leading-normal animate-fadeIn;
   }
 
-  /* 3. .typing-indicator */
   .typing-indicator {
     @apply inline-flex items-center ml-2;
   }
 
-  /* 4. .typing-indicator .dot */
   .typing-indicator .dot {
     @apply inline-block w-2 h-2 rounded-full bg-zinc-500 mr-1 animate-customBounce;
-    /* animate-customBounce tham chiếu đến animation tùy chỉnh */
   }
 
-  /* Đối với animation-delay cho các dot cụ thể: */
   .typing-indicator .dot:nth-child(1) {
-    @apply [animation-delay:0s]; /* Sử dụng cú pháp giá trị tùy ý của Tailwind */
+    @apply [animation-delay:0s]; 
   }
   .typing-indicator .dot:nth-child(2) {
     @apply [animation-delay:0.2s];
@@ -151,62 +139,19 @@
     @apply [animation-delay:0.4s];
   }
 
-  /* 5. .code-block-wrapper */
   .code-block-wrapper {
     @apply my-4 rounded overflow-hidden font-mono text-sm shadow-md;
-    /* shadow-md là một giá trị gần đúng, có thể dùng shadow-[0_2px_6px_rgba(0,0,0,0.15)] cho chính xác */
   }
 
-  /* 6. .code-block-header */
   .code-block-header {
-    @apply bg-zinc-800 text-zinc-100 py-2 px-3 text-xs font-medium flex justify-between items-center;
+    @apply bg-zinc-800 py-2 px-3 text-xs font-medium flex justify-between items-center;
   }
 
-  /* 7. .code-language-tag */
   .code-language-tag {
-    @apply bg-white/15 text-zinc-200 py-0.5 px-1.5 rounded text-[11px] uppercase tracking-wider;
-    /* py-0.5 (2px), px-1.5 (6px) nếu đã định nghĩa trong config. text-[11px] cho font size chính xác. */
-    /* tracking-wider là 0.05em, có thể dùng tracking-[0.5px] cho chính xác */
+    @apply bg-white/15 text-amber-600 py-0.5 px-1.5 rounded text-[11px] lowercase tracking-wider;
   }
 
-  /* 8. .inline-code */
   .inline-code {
     @apply bg-black/5 rounded-sm font-mono py-0.5 px-[5px] text-[0.9em] text-pink-600;
-    /* rounded-sm (2px), dùng rounded-[3px] cho chính xác. */
-    /* py-0.5 (2px), px-[5px] cho chính xác 5px. */
-  }
-
-  /* 9. .add-message-btn */
-  .add-message-btn {
-    @apply bg-blue-500 text-white border-none py-2.5 px-4 rounded cursor-pointer mb-5 text-sm font-medium transition-colors duration-200 hover:bg-blue-600 active:bg-blue-700;
-    /* py-2.5 (10px) nếu đã định nghĩa trong config. */
-    /* Các pseudo-classes như hover:, active: có thể được áp dụng trực tiếp như trên. */
-  }
-
-  /* 10. Markdown Styling (bên trong .chat-message) */
-  /* Cách này hữu ích nếu bạn không muốn dùng plugin @tailwindcss/typography */
-  /* hoặc muốn kiểm soát hoàn toàn style của các thẻ HTML raw */
-  .chat-message h1 {
-    @apply mt-0 text-2xl mb-4 text-zinc-800;
-  }
-
-  .chat-message h2 {
-    @apply text-xl mt-6 mb-3 text-zinc-700;
-  }
-
-  .chat-message p {
-    @apply mb-4;
-  }
-
-  .chat-message ul {
-    @apply mb-4 pl-6 list-disc; /* Thêm list-disc cho kiểu danh sách */
-  }
-
-  .chat-message ol {
-    @apply mb-4 pl-6 list-decimal; /* Thêm list-decimal cho kiểu danh sách */
-  }
-
-  .chat-message li {
-    @apply mb-1;
   }
 }

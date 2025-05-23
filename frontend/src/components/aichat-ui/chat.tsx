@@ -4,6 +4,7 @@ import React, { Fragment } from "react";
 import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { darcula as theme } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { cn } from "@/lib/utils";
 
 interface Props extends React.PropsWithChildren {
   message: Message | null;
@@ -89,10 +90,18 @@ export default function Chat({ message, isTyping = false }: Props) {
 
   return (
     <Fragment>
-      <div className="chat-message">
+      <div className="chat-message" >
         {parsedMessage && (
           <>
-            <Markdown options={markdownOptions}>{parsedMessage}</Markdown>
+            <Markdown
+              className={cn(
+                "prose prose-h1:mb-3 prose-h2:mb-2 prose-h2:mt-4 prose-h2:font-[800] prose-h3:mt-4 prose-h3:mb-1.5 prose-h3:font-[600] dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 font-[400]",
+                "max-w-none break-words text-black dark:text-white"
+              )}
+              options={markdownOptions}
+            >
+              {parsedMessage}
+            </Markdown>
             {isTyping && (
               <span className="typing-indicator">
                 <span className="dot"></span>

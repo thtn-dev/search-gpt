@@ -6,7 +6,7 @@ import ThemeSwitcher from "../theme-switcher";
 
 export default function ThreadHeader() {
   return (
-    <header className="flex h-16 sticky shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 shadow-sm">
+    <header className="flex h-12 sticky shrink-0 items-center gap-2 transition-[width,height] ease-linear shadow-sm">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <ThemeSwitcher />
