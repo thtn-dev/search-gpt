@@ -14,19 +14,19 @@ export function FileItem({ file, onRemove, className }: FileItemProps) {
   return (
     <div
       className={cn(
-        "flex items-center gap-2 bg-white dark:bg-gray-700 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-600 transition-all hover:shadow-sm",
+        "flex items-center gap-2 bg-accent px-3 py-2 rounded-md border transition-all hover:shadow-sm",
         className,
       )}
     >
-      <span className="text-gray-500 dark:text-gray-400">{getFileIcon(file.name)}</span>
+      <span className="text-zinc-500 dark:text-zinc-400">{getFileIcon(file.name)}</span>
       <div className="flex flex-col">
         <span className="text-sm font-medium truncate max-w-[150px]">{file.name}</span>
-        <span className="text-xs text-gray-500 dark:text-gray-400">{formatFileSize(file.size)}</span>
+        <span className="text-xs text-zinc-500 dark:text-zinc-400">{formatFileSize(file.size)}</span>
       </div>
       <Button
         variant="ghost"
         size="icon"
-        className="h-6 w-6 ml-1 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+        className="h-6 w-6 ml-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
         onClick={onRemove}
       >
         <X className="h-3.5 w-3.5" />

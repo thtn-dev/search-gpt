@@ -32,7 +32,7 @@ export function AttachButton({
         type="button"
         variant="outline"
         size="icon"
-        className="h-9 w-9 shrink-0 rounded-full text-gray-500 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:bg-gray-800 transition-colors"
+        className="h-9 w-9 shrink-0 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-300 dark:hover:bg-zinc-800 transition-colors"
         onClick={() => fileInputRef.current?.click()}
         disabled={disabled}
       >

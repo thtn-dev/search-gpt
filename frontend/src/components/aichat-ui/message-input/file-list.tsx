@@ -13,7 +13,7 @@ export function FileList({ files, onRemoveFile, className }: FileListProps) {
   return (
     <div
       className={cn(
-        "flex flex-wrap gap-2 mb-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700",
+        "flex flex-wrap gap-2 mb-2 p-3 bg-card rounded-lg border ",
         className,
       )}
     >

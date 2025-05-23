@@ -91,9 +91,9 @@ export function MessageInput({
       <form
         onSubmit={handleSubmit}
         className={cn(
-          "h-auto flex flex-col gap-0 border  border-gray-200 dark:border-gray-700 rounded-2xl p-2 bg-white dark:bg-gray-800 relative transition duration-200 ease-in-out hover:shadow-md",
+          "h-auto flex flex-col gap-0 border rounded-xl p-2 bg-card relative transition duration-200 ease-in-out hover:shadow-md",
           isDraggingOver &&
-            "border-blue-500 border-dashed bg-blue-50 dark:bg-blue-900/20"
+            "border-primary border-dashed"
         )}
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}

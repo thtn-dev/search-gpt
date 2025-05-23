@@ -43,7 +43,7 @@ export const MessageTextarea = forwardRef<HTMLTextAreaElement, MessageTextareaPr
           disabled={disabled}
           rows={1}
           className={cn(
-            "w-full resize-none bg-transparent py-2 px-2 focus:outline-none focus:ring-0 dark:text-gray-100",
+            "w-full resize-none bg-transparent py-2 px-2 focus:outline-none focus:ring-0 text-primary",
             className,
           )}
           style={{ maxHeight: "200px", overflowY: "auto" }}

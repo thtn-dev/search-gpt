@@ -125,7 +125,7 @@
 
   /* 2. .chat-message */
   .chat-message {
-    @apply bg-gray-100 rounded-lg py-3 px-4 mb-4 relative leading-normal animate-fadeIn;
+    @apply bg-zinc-100 rounded-lg py-3 px-4 mb-4 relative leading-normal animate-fadeIn;
     /* animate-fadeIn tham chiếu đến animation đã định nghĩa trong tailwind.config.js */
   }
 
@@ -136,7 +136,7 @@
 
   /* 4. .typing-indicator .dot */
   .typing-indicator .dot {
-    @apply inline-block w-2 h-2 rounded-full bg-gray-500 mr-1 animate-customBounce;
+    @apply inline-block w-2 h-2 rounded-full bg-zinc-500 mr-1 animate-customBounce;
     /* animate-customBounce tham chiếu đến animation tùy chỉnh */
   }
 
@@ -159,12 +159,12 @@
 
   /* 6. .code-block-header */
   .code-block-header {
-    @apply bg-gray-800 text-gray-100 py-2 px-3 text-xs font-medium flex justify-between items-center;
+    @apply bg-zinc-800 text-zinc-100 py-2 px-3 text-xs font-medium flex justify-between items-center;
   }
 
   /* 7. .code-language-tag */
   .code-language-tag {
-    @apply bg-white/15 text-gray-200 py-0.5 px-1.5 rounded text-[11px] uppercase tracking-wider;
+    @apply bg-white/15 text-zinc-200 py-0.5 px-1.5 rounded text-[11px] uppercase tracking-wider;
     /* py-0.5 (2px), px-1.5 (6px) nếu đã định nghĩa trong config. text-[11px] cho font size chính xác. */
     /* tracking-wider là 0.05em, có thể dùng tracking-[0.5px] cho chính xác */
   }
@@ -187,11 +187,11 @@
   /* Cách này hữu ích nếu bạn không muốn dùng plugin @tailwindcss/typography */
   /* hoặc muốn kiểm soát hoàn toàn style của các thẻ HTML raw */
   .chat-message h1 {
-    @apply mt-0 text-2xl mb-4 text-gray-800;
+    @apply mt-0 text-2xl mb-4 text-zinc-800;
   }
 
   .chat-message h2 {
-    @apply text-xl mt-6 mb-3 text-gray-700;
+    @apply text-xl mt-6 mb-3 text-zinc-700;
   }
 
   .chat-message p {

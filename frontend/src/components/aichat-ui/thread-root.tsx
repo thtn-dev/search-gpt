@@ -137,14 +137,13 @@ export function ThreadRoot({ threadId }: Props) {
                 <Chat message={currentMessage} isTyping={isTyping} />
               )}
             </section>
+            {/* MessageInput - cố định ở dưới cùng */}
+            <div className="sticky bottom-0 pb-2 bg-background">
+              <div className="w-full max-w-4xl mx-auto">
+                <MessageInput className="w-full" onSendMessage={() => {}} />
+              </div>
+            </div>
           </ScrollArea>
-        </div>
-
-        {/* MessageInput - cố định ở dưới cùng */}
-        <div className="flex-shrink-0 pb-3">
-          <div className="w-full max-w-4xl mx-auto">
-            <MessageInput className="w-full" onSendMessage={() => {}} />
-          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>
