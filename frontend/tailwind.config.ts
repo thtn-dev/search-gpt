@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: ['class'],
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}'
   ],
   theme: {
     extend: {
@@ -64,7 +64,7 @@ const config: Config = {
           accent: 'hsl(var(--sidebar-accent))',
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
-          ring: 'hsl(var(--sidebar-ring))',
+          ring: 'hsl(var(--sidebar-ring))'
         }
       },
       keyframes: {
@@ -99,14 +99,11 @@ const config: Config = {
         '2.5': '10px'
       },
       fontSize: {
-        '11px': '11px',
+        '11px': '11px'
       }
     }
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    require("@tailwindcss/typography")
-  ]
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')]
 };
 
 export default config;

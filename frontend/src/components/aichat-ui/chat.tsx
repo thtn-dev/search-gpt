@@ -1,10 +1,11 @@
-"use client";
-import { Message } from "@/schemas/chat-schema";
-import React, { Fragment } from "react";
-import Markdown, { MarkdownToJSX } from "markdown-to-jsx";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { darcula as theme } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { cn } from "@/lib/utils";
+'use client';
+
+import React, { Fragment } from 'react';
+import { cn } from '@/lib/utils';
+import { Message } from '@/schemas/chat-schema';
+import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { darcula as theme } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 interface Props extends React.PropsWithChildren {
   message: Message | null;
@@ -14,27 +15,27 @@ interface Props extends React.PropsWithChildren {
 // Custom Code component for syntax highlighting
 const CodeBlock = ({
   className,
-  children,
+  children
 }: {
   className?: string;
   children: React.ReactNode;
 }) => {
   // Extract language from className (format: "language-xxx")
-  const match = /lang-(\w+)/.exec(className || "");
-  const language = match ? match[1] : "text";
+  const match = /lang-(\w+)/.exec(className || '');
+  const language = match ? match[1] : 'text';
 
   return (
-    <div className="code-block-wrapper">
-      <div className="code-block-header">
-        {language && <span className="code-language-tag">{language}</span>}
+    <div className='code-block-wrapper'>
+      <div className='code-block-header'>
+        {language && <span className='code-language-tag'>{language}</span>}
       </div>
       <SyntaxHighlighter
         language={language}
         style={theme}
         showLineNumbers
-        customStyle={{ margin: 0, borderRadius: "0 0 4px 4px" }}
+        customStyle={{ margin: 0, borderRadius: '0 0 4px 4px' }}
       >
-        {String(children).replace(/\n$/, "")}
+        {String(children).replace(/\n$/, '')}
       </SyntaxHighlighter>
     </div>
   );
@@ -42,7 +43,7 @@ const CodeBlock = ({
 
 // Custom inline code component
 const InlineCode = ({ children }: { children: React.ReactNode }) => (
-  <code className="inline-code">{children}</code>
+  <code className='inline-code'>{children}</code>
 );
 
 export default function Chat({ message, isTyping = false }: Props) {
@@ -60,17 +61,17 @@ export default function Chat({ message, isTyping = false }: Props) {
   const markdownOptions: MarkdownToJSX.Options = {
     overrides: {
       code: {
-        component: InlineCode,
+        component: InlineCode
       },
       pre: {
         component: ({
           children,
           ...props
-        }: React.ComponentPropsWithoutRef<"pre">) => {
+        }: React.ComponentPropsWithoutRef<'pre'>) => {
           if (
             children &&
             React.isValidElement(children) &&
-            typeof children === "object"
+            typeof children === 'object'
           ) {
             const codeElement = children as React.ReactElement<{
               className?: string;
@@ -83,30 +84,30 @@ export default function Chat({ message, isTyping = false }: Props) {
             );
           }
           return <pre {...props}>{children}</pre>;
-        },
-      },
-    },
+        }
+      }
+    }
   };
 
   return (
     <Fragment>
-      <div className="chat-message" >
+      <div className='chat-message'>
         {parsedMessage && (
           <>
             <Markdown
               className={cn(
-                "prose prose-h1:mb-3 prose-h2:mb-2 prose-h2:mt-4 prose-h2:font-[800] prose-h3:mt-4 prose-h3:mb-1.5 prose-h3:font-[600] dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 font-[400]",
-                "max-w-none break-words text-black dark:text-white"
+                'prose prose-h1:mb-3 prose-h2:mb-2 prose-h2:mt-4 prose-h2:font-[800] prose-h3:mt-4 prose-h3:mb-1.5 prose-h3:font-[600] dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 font-[400]',
+                'max-w-none break-words text-black dark:text-white'
               )}
               options={markdownOptions}
             >
               {parsedMessage}
             </Markdown>
             {isTyping && (
-              <span className="typing-indicator">
-                <span className="dot"></span>
-                <span className="dot"></span>
-                <span className="dot"></span>
+              <span className='typing-indicator'>
+                <span className='dot'></span>
+                <span className='dot'></span>
+                <span className='dot'></span>
               </span>
             )}
           </>

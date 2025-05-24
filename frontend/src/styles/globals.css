@@ -36,21 +36,21 @@
     --sidebar-border: 0 0% 92.16%;
     --sidebar-ring: 0 0% 70.98%;
     --font-sans: Inter, sans-serif;
-    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: JetBrains Mono, monospace;
     --radius: 0.5rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-sm:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   }
 
@@ -88,21 +88,21 @@
     --sidebar-border: 0 0% 92.16%;
     --sidebar-ring: 0 0% 70.98%;
     --font-sans: Inter, sans-serif;
-    --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: JetBrains Mono, monospace;
     --radius: 0.5rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1),
-      0 8px 10px -1px hsl(0 0% 0% / 0.1);
+    --shadow-sm:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+    --shadow-md:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+    --shadow-lg:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+    --shadow-xl:
+      0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   }
 }
@@ -116,21 +116,20 @@
 }
 
 @layer components {
-
   .chat-message {
-    @apply bg-card rounded-lg py-3 px-4 mb-4 relative leading-normal animate-fadeIn;
+    @apply relative mb-4 animate-fadeIn rounded-lg bg-card px-4 py-3 leading-normal;
   }
 
   .typing-indicator {
-    @apply inline-flex items-center ml-2;
+    @apply ml-2 inline-flex items-center;
   }
 
   .typing-indicator .dot {
-    @apply inline-block w-2 h-2 rounded-full bg-zinc-500 mr-1 animate-customBounce;
+    @apply mr-1 inline-block h-2 w-2 animate-customBounce rounded-full bg-zinc-500;
   }
 
   .typing-indicator .dot:nth-child(1) {
-    @apply [animation-delay:0s]; 
+    @apply [animation-delay:0s];
   }
   .typing-indicator .dot:nth-child(2) {
     @apply [animation-delay:0.2s];
@@ -140,18 +139,18 @@
   }
 
   .code-block-wrapper {
-    @apply my-4 rounded overflow-hidden font-mono text-sm shadow-md;
+    @apply my-4 overflow-hidden rounded font-mono text-sm shadow-md;
   }
 
   .code-block-header {
-    @apply bg-zinc-800 py-2 px-3 text-xs font-medium flex justify-between items-center;
+    @apply flex items-center justify-between bg-zinc-800 px-3 py-2 text-xs font-medium;
   }
 
   .code-language-tag {
-    @apply bg-white/15 text-amber-600 py-0.5 px-1.5 rounded text-[11px] lowercase tracking-wider;
+    @apply rounded bg-white/15 px-1.5 py-0.5 text-[11px] lowercase tracking-wider text-amber-600;
   }
 
   .inline-code {
-    @apply bg-black/5 rounded-sm font-mono py-0.5 px-[5px] text-[0.9em] text-pink-600;
+    @apply rounded-sm bg-black/5 px-[5px] py-0.5 font-mono text-[0.9em] text-pink-600;
   }
 }

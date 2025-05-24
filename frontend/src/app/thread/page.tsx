@@ -1,8 +1,6 @@
-import { ThreadRoot } from '@/components/aichat-ui/thread-root'
-import React from 'react'
+import React from 'react';
+import { ThreadRoot } from '@/components/aichat-ui/thread-root';
 
 export default function ThreadPge() {
-  return (
-    <ThreadRoot threadId='abcxyz' />
-  )
+  return <ThreadRoot threadId='abcxyz' />;
 }

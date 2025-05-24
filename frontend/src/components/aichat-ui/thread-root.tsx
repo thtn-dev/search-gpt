@@ -1,12 +1,13 @@
-"use client";
-import * as React from "react";
-import Chat from "./chat";
-import { Message } from "@/schemas/chat-schema";
-import { MessageInput } from "./message-input";
-import { ScrollArea } from "../ui/scroll-area";
-import { SidebarInset, SidebarProvider } from "../ui/sidebar";
-import { AppSidebar } from "./sidebar/app-sidebar";
-import ThreadHeader from "./thread-header";
+'use client';
+
+import * as React from 'react';
+import { Message } from '@/schemas/chat-schema';
+import { ScrollArea } from '../ui/scroll-area';
+import { SidebarInset, SidebarProvider } from '../ui/sidebar';
+import Chat from './chat';
+import { MessageInput } from './message-input';
+import { AppSidebar } from './sidebar/app-sidebar';
+import ThreadHeader from './thread-header';
 
 interface Props {
   threadId?: string;
@@ -70,14 +71,14 @@ export function ThreadRoot({ threadId }: Props) {
 
       // Create the initial message
       setCurrentMessage({
-        role: "assistant",
-        content: "",
+        role: 'assistant',
+        content: '',
         createdAt: new Date(),
-        threadId: threadId || "default-thread-id",
+        threadId: threadId || 'default-thread-id'
       });
 
       const messageToStream = exampleMessage; // Use the example message with code blocks
-      let accumulatedContent = "";
+      let accumulatedContent = '';
 
       // Stream each character with a delay
       // This approach preserves formatting better than word-by-word for code blocks
@@ -88,7 +89,7 @@ export function ThreadRoot({ threadId }: Props) {
             if (prev) {
               return {
                 ...prev,
-                content: accumulatedContent,
+                content: accumulatedContent
               };
             }
             return null;
@@ -121,12 +122,12 @@ export function ThreadRoot({ threadId }: Props) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="relative flex flex-col h-screen">
+      <SidebarInset className='relative flex flex-col h-screen'>
         <ThreadHeader />
         {/* Main content area - flex-1 để chiếm hết không gian còn lại */}
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <section className="w-full max-w-4xl mx-auto p-5">
+        <div className='flex-1 overflow-hidden'>
+          <ScrollArea className='h-full'>
+            <section className='w-full max-w-4xl mx-auto p-5'>
               {/* Show previous messages */}
               {messages.map((msg, index) => (
                 <Chat key={`msg-${index}`} message={msg} />
@@ -137,9 +138,9 @@ export function ThreadRoot({ threadId }: Props) {
               )}
             </section>
             {/* MessageInput - cố định ở dưới cùng */}
-            <div className="sticky bottom-0 pb-2 bg-background">
-              <div className="w-full max-w-4xl mx-auto">
-                <MessageInput className="w-full" onSendMessage={() => {}} />
+            <div className='sticky bottom-0 pb-2 bg-background'>
+              <div className='w-full max-w-4xl mx-auto'>
+                <MessageInput className='w-full' onSendMessage={() => {}} />
               </div>
             </div>
           </ScrollArea>

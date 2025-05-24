@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import type React from "react";
-
-import { useState, useRef, type FormEvent } from "react";
-import { FileList } from "./file-list";
-import { MessageTextarea } from "./message-textarea";
-import { AttachButton } from "./attach-button";
-import { SendButton } from "./send-button";
-import { DragDropOverlay } from "./drag-drop-overlay";
-import { cn } from "@/lib/utils";
+import type React from 'react';
+import { useState, useRef, type FormEvent } from 'react';
+import { cn } from '@/lib/utils';
+import { AttachButton } from './attach-button';
+import { DragDropOverlay } from './drag-drop-overlay';
+import { FileList } from './file-list';
+import { MessageTextarea } from './message-textarea';
+import { SendButton } from './send-button';
 
 interface MessageInputProps {
   onSendMessage: (message: string, files: File[]) => void;
@@ -19,11 +18,11 @@ interface MessageInputProps {
 
 export function MessageInput({
   onSendMessage,
-  placeholder = "Ask me anything...",
+  placeholder = 'Ask me anything...',
   disabled = false,
-  className,
+  className
 }: MessageInputProps) {
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState<string>('');
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -43,12 +42,12 @@ export function MessageInput({
 
     if (message.trim() || files.length > 0) {
       onSendMessage(message, files);
-      setMessage("");
+      setMessage('');
       setFiles([]);
 
       // Reset textarea height
       if (textareaRef.current) {
-        textareaRef.current.style.height = "auto";
+        textareaRef.current.style.height = 'auto';
       }
     }
   };
@@ -83,7 +82,7 @@ export function MessageInput({
   };
 
   return (
-    <div className={cn("w-full", className)}>
+    <div className={cn('w-full', className)}>
       {files.length > 0 && (
         <FileList files={files} onRemoveFile={handleRemoveFile} />
       )}
@@ -91,9 +90,8 @@ export function MessageInput({
       <form
         onSubmit={handleSubmit}
         className={cn(
-          "h-auto flex flex-col gap-0 border rounded-xl p-2 bg-card relative transition duration-200 ease-in-out hover:shadow-md",
-          isDraggingOver &&
-            "border-primary border-dashed"
+          'h-auto flex flex-col gap-0 border rounded-xl p-2 bg-card relative transition duration-200 ease-in-out hover:shadow-md',
+          isDraggingOver && 'border-primary border-dashed'
         )}
         onDragEnter={handleDragEnter}
         onDragOver={handleDragOver}
@@ -108,14 +106,14 @@ export function MessageInput({
           disabled={disabled}
           onEnterSubmit={handleSubmit}
         />
-        <div className="flex items-center justify-between">
+        <div className='flex items-center justify-between'>
           <AttachButton
             disabled={disabled}
             fileInputRef={fileInputRef}
             onFilesSelected={handleAddFiles}
           />
           <SendButton
-            disabled={disabled || (message.trim() === "" && files.length === 0)}
+            disabled={disabled || (message.trim() === '' && files.length === 0)}
           />
         </div>
 

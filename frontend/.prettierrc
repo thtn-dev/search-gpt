@@ -1,0 +1,30 @@
+{
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "semi": true,
+  "useTabs": false,
+  "trailingComma": "none",
+  "jsxSingleQuote": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "endOfLine": "lf",
+  "plugins": [
+    "prettier-plugin-tailwindcss",
+    "@trivago/prettier-plugin-sort-imports"
+  ],
+  "importOrder": [
+    "^path$",
+    "^react$",
+    "^react-dom/client$",
+    "^react/(.*)$",
+    "^globals$",
+    "^zod$",
+    "^axios$",
+    "^date-fns$",
+    "^use-intl$",
+    "^@radix-ui/(.*)$",
+    "^@hookform/resolvers/zod$",
+    "<THIRD_PARTY_MODULES>",
+    "^[./]"
+  ]
+}
