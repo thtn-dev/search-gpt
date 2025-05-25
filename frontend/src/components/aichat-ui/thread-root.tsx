@@ -51,6 +51,7 @@ h1 {
 p {
   color: #666;
   font-size: 16px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 \`\`\`
 

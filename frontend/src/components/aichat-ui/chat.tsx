@@ -4,42 +4,14 @@ import React, { Fragment } from 'react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/schemas/chat-schema';
 import Markdown, { MarkdownToJSX } from 'markdown-to-jsx';
-import SyntaxHighlighter from 'react-syntax-highlighter';
 import { darcula as theme } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import CodeBlock from './code-block';
 
 interface Props extends React.PropsWithChildren {
   message: Message | null;
   isTyping?: boolean;
 }
 
-// Custom Code component for syntax highlighting
-const CodeBlock = ({
-  className,
-  children
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) => {
-  // Extract language from className (format: "language-xxx")
-  const match = /lang-(\w+)/.exec(className || '');
-  const language = match ? match[1] : 'text';
-
-  return (
-    <div className='code-block-wrapper'>
-      <div className='code-block-header'>
-        {language && <span className='code-language-tag'>{language}</span>}
-      </div>
-      <SyntaxHighlighter
-        language={language}
-        style={theme}
-        showLineNumbers
-        customStyle={{ margin: 0, borderRadius: '0 0 4px 4px' }}
-      >
-        {String(children).replace(/\n$/, '')}
-      </SyntaxHighlighter>
-    </div>
-  );
-};
 
 // Custom inline code component
 const InlineCode = ({ children }: { children: React.ReactNode }) => (
@@ -78,7 +50,7 @@ export default function Chat({ message, isTyping = false }: Props) {
               children: React.ReactNode;
             }>;
             return (
-              <CodeBlock className={codeElement.props.className}>
+              <CodeBlock theme={theme} className={codeElement.props.className}>
                 {codeElement.props.children}
               </CodeBlock>
             );
