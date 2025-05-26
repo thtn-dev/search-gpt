@@ -1,118 +1,118 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { AuthApi } from "@/lib/api/auth";
-import { zodResolver } from "@hookform/resolvers/zod";
+  FormMessage
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { AuthApi } from '@/lib/api/auth';
 import {
   FigmaIcon,
   GithubIcon,
   InstagramIcon,
   TwitchIcon,
-  TwitterIcon,
-} from "lucide-react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+  TwitterIcon
+} from 'lucide-react';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
 
 const formSchema = z.object({
   email: z.string().email(),
-  username: z.string().min(3, "Username must be at least 3 characters long"),
-  password: z.string().min(8, "Password must be at least 8 characters long"),
+  username: z.string().min(3, 'Username must be at least 3 characters long'),
+  password: z.string().min(8, 'Password must be at least 8 characters long')
 });
 
 const SignUp05Page = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      email: "",
-      username: "",
-      password: "",
+      email: '',
+      username: '',
+      password: ''
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema)
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
-    await AuthApi.register(data)
+    await AuthApi.register(data);
   };
 
   return (
-    <div className="h-screen flex items-center justify-center">
-      <div className="w-full h-full grid lg:grid-cols-2 p-4">
-        <div className="max-w-xs m-auto w-full flex flex-col items-center">
-          <p className="mt-4 text-xl font-bold tracking-tight">
+    <div className='h-screen flex items-center justify-center'>
+      <div className='w-full h-full grid lg:grid-cols-2 p-4'>
+        <div className='max-w-xs m-auto w-full flex flex-col items-center'>
+          <p className='mt-4 text-xl font-bold tracking-tight'>
             Sign up for Shadcn Blocks
           </p>
 
-          <div className="mt-8 flex items-center gap-3">
+          <div className='mt-8 flex items-center gap-3'>
             <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='rounded-full h-10 w-10'
             >
-              <GithubIcon className="!h-[18px] !w-[18px]" />
+              <GithubIcon className='!h-[18px] !w-[18px]' />
             </Button>
             <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='rounded-full h-10 w-10'
             >
-              <InstagramIcon className="!h-[18px] !w-[18px]" />
+              <InstagramIcon className='!h-[18px] !w-[18px]' />
             </Button>
             <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='rounded-full h-10 w-10'
             >
-              <TwitterIcon className="!h-[18px] !w-[18px]" />
+              <TwitterIcon className='!h-[18px] !w-[18px]' />
             </Button>
             <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='rounded-full h-10 w-10'
             >
-              <FigmaIcon className="!h-[18px] !w-[18px]" />
+              <FigmaIcon className='!h-[18px] !w-[18px]' />
             </Button>
             <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full h-10 w-10"
+              variant='outline'
+              size='icon'
+              className='rounded-full h-10 w-10'
             >
-              <TwitchIcon className="!h-[18px] !w-[18px]" />
+              <TwitchIcon className='!h-[18px] !w-[18px]' />
             </Button>
           </div>
 
-          <div className="my-7 w-full flex items-center justify-center overflow-hidden">
+          <div className='my-7 w-full flex items-center justify-center overflow-hidden'>
             <Separator />
-            <span className="text-sm px-2">OR</span>
+            <span className='text-sm px-2'>OR</span>
             <Separator />
           </div>
 
           <Form {...form}>
             <form
-              className="w-full space-y-4"
+              className='w-full space-y-4'
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <FormField
                 control={form.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Email"
-                        className="w-full"
+                        type='email'
+                        placeholder='Email'
+                        className='w-full'
                         {...field}
                       />
                     </FormControl>
@@ -123,15 +123,15 @@ const SignUp05Page = () => {
 
               <FormField
                 control={form.control}
-                name="username"
+                name='username'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
-                        type="text"
-                        placeholder="Username"
-                        className="w-full"
+                        type='text'
+                        placeholder='Username'
+                        className='w-full'
                         {...field}
                       />
                     </FormControl>
@@ -142,15 +142,15 @@ const SignUp05Page = () => {
 
               <FormField
                 control={form.control}
-                name="password"
+                name='password'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <Input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full"
+                        type='password'
+                        placeholder='Password'
+                        className='w-full'
                         {...field}
                       />
                     </FormControl>
@@ -158,20 +158,23 @@ const SignUp05Page = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="mt-4 w-full">
+              <Button type='submit' className='mt-4 w-full'>
                 Continue with Email
               </Button>
             </form>
           </Form>
 
-          <p className="mt-5 text-sm text-center">
+          <p className='mt-5 text-sm text-center'>
             Already have an account?
-            <Link href="/login" className="ml-1 underline text-muted-foreground">
+            <Link
+              href='/login'
+              className='ml-1 underline text-muted-foreground'
+            >
               Log in
             </Link>
           </p>
         </div>
-        <div className="bg-muted hidden lg:block rounded-lg" />
+        <div className='bg-muted hidden lg:block rounded-lg' />
       </div>
     </div>
   );

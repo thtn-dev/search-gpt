@@ -37,7 +37,7 @@ def create_application() -> FastAPI:
         """Root endpoint"""
         return {"message": "Welcome to the Gemini Chat API!"}    
      # Include API router
-    application.include_router(api_router_v1, prefix="/api/v1")
+    application.include_router(api_router_v1, prefix="/v1")
     return application
 
 app = create_application()

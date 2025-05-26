@@ -22,7 +22,8 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta = Non
 
     jti = uuid6()
     iat = datetime.utcnow()
-    to_encode = {"exp": expire, "sub": str(subject), "type": "access_token", "jti": str(jti), "iat": iat}
+    nbf = iat
+    to_encode = {"exp": expire, "sub": str(subject), "type": "access_token", "jti": str(jti), "iat": iat, "nbf": nbf}
 
     # Thêm các claims tùy chọn nếu chúng được cung cấp
     if additional_claims:

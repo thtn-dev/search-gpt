@@ -1,19 +1,11 @@
-"use client";
-import { Thread } from "@/components/assistant-ui/thread";
-import { AssistantRuntimeProvider } from "@assistant-ui/react";
-import { ThreadList } from "@/components/assistant-ui/thread-list";
-import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
-export default function Home() {
-  // const runtime = useLocalRuntime(MyModelAdapter);
-  const runtime = useChatRuntime({
-    api: "/api/chat",
-  });
+import React from 'react';
+import { ChatProvider } from '@/components/aichat-ui/context/thread-context';
+import { ThreadRoot } from '@/components/aichat-ui/thread-root';
+
+export default function HomePage() {
   return (
-    <AssistantRuntimeProvider runtime={runtime}> 
-      <main className="h-dvh grid grid-cols-[200px_1fr] gap-x-2 px-4 py-4">
-        <ThreadList />
-        <Thread />
-      </main>
-    </AssistantRuntimeProvider>
+    <ChatProvider>
+      <ThreadRoot threadId='abcxyz' />
+    </ChatProvider>
   );
 }

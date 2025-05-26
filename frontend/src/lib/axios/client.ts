@@ -1,13 +1,13 @@
-import { appConfig } from '@/config/app-config';
 import axios from 'axios';
+import { appConfig } from '@/config/app-config';
 import { getSession } from 'next-auth/react';
 
 // Tạo instance axios với URL base
 const axiosClient = axios.create({
   baseURL: appConfig.apiBaseUrl,
   headers: {
-    'Content-Type': 'application/json',
-  },
+    'Content-Type': 'application/json'
+  }
 });
 
 // Thêm interceptor cho request
@@ -15,7 +15,7 @@ axiosClient.interceptors.request.use(
   async (config) => {
     // Lấy session từ NextAuth
     const session = await getSession();
-    console.log("session", session);
+    console.log('session', session);
     // Nếu có token trong session, thêm vào header
     if (session?.user.accessToken) {
       config.headers.Authorization = `Bearer ${session.user.accessToken}`;
@@ -38,14 +38,14 @@ axiosClient.interceptors.response.use(
     // Nếu lỗi 401 (Unauthorized) và chưa thử refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      
+
       try {
         // Ở đây bạn có thể thêm logic refresh token nếu cần
         // Ví dụ: gọi API để refresh token và cập nhật session
-        
+
         // Sau khi refresh, lấy session mới
         const session = await getSession();
-        
+
         // Thực hiện lại request với token mới
         if (session?.user.accessToken) {
           originalRequest.headers.Authorization = `Bearer ${session.user.accessToken}`;
@@ -56,7 +56,7 @@ axiosClient.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

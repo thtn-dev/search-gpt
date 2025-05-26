@@ -1,7 +1,10 @@
 """Authentication and user registration endpoints."""
+from datetime import datetime, timedelta
 import logging
+import uuid
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
@@ -208,3 +211,69 @@ async def handle_nextauth_signin(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred during sign-in processing."
         ) from e
+
+@router.post("/tokens/anonymous")
+async def create_anonymous_token():
+    """
+    Create an anonymous token for a user.
+    """
+    claims = {
+        "workspace_id": uuid.uuid4().__str__(),
+        "project_id": uuid.uuid4().__str__(),
+        "sub": uuid.uuid4().__str__(),
+        "iss": "http://127.0.0.1:8000",
+    }
+    
+    at = create_access_token(
+        subject=str(claims["sub"]),
+        additional_claims=claims,
+    )
+    
+    refesh_token = {
+        "token": "refresh" + str(uuid.uuid4()),
+        "expires_at": datetime.utcnow() + timedelta(days=20),
+    }
+    
+    return {
+        "access_token": at,
+        "refresh_token": refesh_token,
+    }
+
+class RefreshTokenRequest(BaseModel):
+    """
+    Request model for refreshing tokens.
+    """
+    refresh_token: str
+
+
+@router.post("/tokens/refresh")	
+async def refresh_token(
+    body: RefreshTokenRequest = Body(...)
+):
+    """
+    Refresh the access token using the refresh token.
+    """
+    # Here you would typically verify the refresh token and issue a new access token
+    # For simplicity, let's assume the refresh token is valid and we generate a new access token
+    
+    if not body.refresh_token.startswith("refresh"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid refresh token",
+        )
+    
+    claims = {
+        "workspace_id": uuid.uuid4().__str__(),
+        "project_id": uuid.uuid4().__str__(),
+        "sub": uuid.uuid4().__str__(),
+        "iss": "http://127.0.0.1:8000",
+    }
+    
+    at = create_access_token(
+        subject=str(claims["sub"]),
+        additional_claims=claims,
+    )
+    
+    return {
+        "access_token": at,
+    }
