@@ -4,6 +4,8 @@ export type Message = {
   content: string;
   createdAt: Date;
   threadId: string;
+  isStreaming?: boolean;
+  parentId?: string;
 };
 
 export type Thread = {

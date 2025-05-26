@@ -6,12 +6,15 @@ import { MessageInput } from './message-input';
 export default function EmptyChat() {
   const { sendMessage, createThread } = useChatContext();
 
-  const handleSendFirstMessage = (message: string, files: File[]) => {
-    // Create a new thread if it doesn't exist
-    const tId = createThread('New Thread');
-    // Send an initial message
-    sendMessage(message, files, tId);
-  };
+  const handleSendFirstMessage = React.useCallback(
+    async (message: string, files: File[]) => {
+      // Create a new thread if it doesn't exist
+      const tId = await createThread('New Thread');
+      // Send an initial message
+      sendMessage(message, files, tId);
+    },
+    [sendMessage, createThread]
+  );
 
   return (
     <Fragment>

@@ -5,7 +5,7 @@ import { ThreadRoot } from '@/components/aichat-ui/thread-root';
 export default function HomePage() {
   return (
     <ChatProvider>
-      <ThreadRoot threadId='abcxyz' />
+      <ThreadRoot />
     </ChatProvider>
   );
 }
