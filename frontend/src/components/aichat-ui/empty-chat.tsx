@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import { AuroraText } from '../magicui/aurora-text';
-import { useChatContext } from './context/thread-context';
+import { useChatContext } from './context';
 import { MessageInput } from './message-input';
 
 export default function EmptyChat() {

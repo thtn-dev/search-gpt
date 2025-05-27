@@ -3,7 +3,7 @@
 import React, { Fragment } from 'react';
 import { Message } from '@/schemas/chat-schema';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { useChatContext, useCurrentMessages } from './context/thread-context';
+import { useChatContext, useCurrentMessages } from './context';
 import MessageBox from './message-box';
 
 const UserMessageBox = ({

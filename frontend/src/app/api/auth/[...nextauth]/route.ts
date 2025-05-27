@@ -62,7 +62,8 @@ export const AUTH_OPTIONS: NextAuthOptions = {
             id: data.user.id,
             email: data.user.email,
             name: data.user.username,
-            accessToken: data.access_token
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
           };
           return user;
         } catch (error) {
@@ -153,7 +154,7 @@ export const AUTH_OPTIONS: NextAuthOptions = {
             }
           );
 
-          const { access_token: accessToken, user: user2 } = res.data;
+          const { access_token: accessToken, refresh_token: refreshToken, user: user2 } = res.data;
           if (res.status === 200 && accessToken) {
             console.log(
               'FastAPI verification successful. Storing FastAPI token.'
@@ -163,8 +164,9 @@ export const AUTH_OPTIONS: NextAuthOptions = {
               id: user2.email,
               email: user2.email,
               name: user2.username,
-              image: '', // Có thể thêm ảnh nếu cầnJWT token out
-              accessToken: accessToken // Lưu access token từ FastAPI vào token
+              image: '', 
+              accessToken: accessToken, 
+              refreshToken: refreshToken, 
             };
             token.user = tokenUser;
           }
