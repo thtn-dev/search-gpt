@@ -20,7 +20,7 @@ export type LoginResponse = {
 
 export async function login(email: string, password: string) {
   try {
-    const res = await axiosServer.post<LoginResponse>('/api/v1/auth/login', {
+    const res = await axiosServer.post<LoginResponse>('/v1/auth/login', {
       email,
       password
     });

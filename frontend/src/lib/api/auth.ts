@@ -2,7 +2,7 @@ import axiosClient from '../axios/client';
 
 export const AuthApi = {
   async ping(): Promise<string> {
-    const res = await axiosClient.post<string>('/api/v1/users/ping');
+    const res = await axiosClient.post<string>('/v1/users/ping');
     return res.data;
   },
   async register(user: {
@@ -10,7 +10,7 @@ export const AuthApi = {
     password: string;
     username: string;
   }): Promise<void> {
-    const res = await axiosClient.post('/api/v1/auth/register', user);
+    const res = await axiosClient.post('/v1/auth/register', user);
     return res.data;
   }
 };

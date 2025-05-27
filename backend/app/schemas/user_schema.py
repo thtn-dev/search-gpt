@@ -1,6 +1,7 @@
 """Pydantic models (schemas) for user-related data validation and serialization."""
 import re
 from typing import Annotated, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlmodel import SQLModel
@@ -69,7 +70,7 @@ class UserLogin(BaseModel):
 
 class UserBase(SQLModel):
     """Base user schema with core user information."""
-    id: int
+    id: UUID
     username: str
     email: EmailStr # Changed from str to EmailStr for consistency
     is_active: bool
@@ -91,6 +92,7 @@ class UserBase(SQLModel):
 class UserLoginResponse(BaseModel):
     """Response model for user login, including token and user details."""
     access_token: str
+    refresh_token: str
     token_type: str = "Bearer"
     user: UserBase
 

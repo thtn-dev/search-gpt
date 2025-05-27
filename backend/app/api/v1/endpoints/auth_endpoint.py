@@ -131,10 +131,17 @@ async def login(
 
     additional_claims = {"username": db_user.username, "email": db_user.email}
     access_token = create_access_token(subject=str(db_user.id), additional_claims=additional_claims)
+    
+    # refresh_token 
+    refresh_token = create_access_token(
+        subject=str(db_user.id),  # ID hệ thống FastAPI
+        expires_delta=timedelta(days=30)  # Example: 30 days for refresh token
+    )
 
     response = UserLoginResponse(
         access_token=access_token,
-        user=UserBase.model_validate(db_user) # Ensure response matches UserBase
+        user=UserBase.model_validate(db_user),
+        refresh_token=refresh_token,
     )
     return response
 
@@ -188,12 +195,19 @@ async def handle_nextauth_signin(
             subject=str(db_user_model.id),  # ID hệ thống FastAPI
             additional_claims=additional_claims
         )
+        
+        # refresh_token
+        refresh_token = create_access_token(
+            subject=str(db_user_model.id),  # ID hệ thống FastAPI
+            expires_delta=timedelta(days=30)  # Example: 30 days for refresh token
+        )
 
         # 4. Prepare and Return Response
         user_response_data = UserBase.model_validate(db_user_model)
         return UserLoginResponse(
             access_token=fastapi_access_token,
-            user=user_response_data
+            user=user_response_data,
+            refresh_token=refresh_token,
         )
 
     except HTTPException as e:
