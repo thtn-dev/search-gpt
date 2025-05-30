@@ -11,18 +11,17 @@ import secrets
 import time
 import uuid
 
-
 class UUID(uuid.UUID):
     r"""UUID draft version objects"""
 
     def __init__(
         self,
-        hex: str = None,
-        bytes: bytes = None,
-        bytes_le: bytes = None,
-        fields: tuple[int, int, int, int, int, int] = None,
-        int: int = None,
-        version: int = None,
+        version: int,
+        hex: str | None = None,
+        bytes: bytes | None = None,
+        bytes_le: bytes | None = None,
+        fields: tuple[int, int, int, int, int, int] | None = None,
+        int: int | None = None,
         *,
         is_safe=uuid.SafeUUID.unknown,
     ) -> None:
@@ -38,17 +37,18 @@ class UUID(uuid.UUID):
                 version=version,
                 is_safe=is_safe,
             )
-        if not 0 <= int < 1 << 128:
+        if int is not None and not 0 <= int < 1 << 128:
             raise ValueError("int is out of range (need a 128-bit value)")
         if version is not None:
             if not 6 <= version <= 7:
                 raise ValueError("illegal version number")
-            # Set the variant to RFC 4122.
-            int &= ~(0xC000 << 48)
-            int |= 0x8000 << 48
-            # Set the version number.
-            int &= ~(0xF000 << 64)
-            int |= version << 76
+            if int is not None:
+                # Set the variant to RFC 4122.
+                int &= ~(0xC000 << 48)
+                int |= 0x8000 << 48
+                # Set the version number.
+                int &= ~(0xF000 << 64)
+                int |= version << 76
         super().__init__(int=int, is_safe=is_safe)
 
     @property
@@ -80,7 +80,7 @@ _last_v6_timestamp = None
 _last_v7_timestamp = None
 
 
-def uuid6(clock_seq: int = None) -> UUID:
+def uuid6(clock_seq: int | None = None) -> UUID:
     r"""UUID version 6 is a field-compatible version of UUIDv1, reordered for
     improved DB locality.  It is expected that UUIDv6 will primarily be
     used in contexts where there are existing v1 UUIDs.  Systems that do
@@ -134,3 +134,16 @@ def uuid7() -> UUID:
     uuid_int |= subsec_b << 54
     uuid_int |= rand
     return UUID(int=uuid_int, version=7)
+
+
+def is_valid_uuid(uuid_to_test, version=4):
+    """
+    Check if uuid_to_test is a valid UUID.
+    """
+    try:
+        uuid_obj = uuid.UUID(uuid_to_test.strip(), version=version)
+    except ValueError:
+        return False
+
+    # return comparison
+    return str(uuid_obj) == uuid_to_test.strip()

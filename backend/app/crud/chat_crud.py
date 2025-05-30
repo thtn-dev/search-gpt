@@ -17,7 +17,6 @@ from sqlmodel import select
 
 logger = logging.getLogger(__name__)
 
-
 class ChatCRUD:
     """
     CRUD operations for chat messages.

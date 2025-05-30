@@ -171,9 +171,9 @@ async def handle_nextauth_signin(
             logger.error("Rolling back due to commit integrity error: ", exc_info=True)
             await crud.session.rollback()
             # Attempt to fetch the user again, as it might have been created by a concurrent request
-            db_user_model = await crud.get_user_by_oauth_details(
+            db_user_model = await crud.get_user_by_provider_key(
                 provider=verified_user_info.provider,
-                provider_id=verified_user_info.provider_id
+                provider_key=verified_user_info.provider_key
             )
             if not db_user_model:
                 raise HTTPException(

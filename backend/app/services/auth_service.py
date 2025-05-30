@@ -1,5 +1,6 @@
 """Authentication service to handle user authorization."""
 from typing import Optional
+import uuid
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
@@ -28,19 +29,19 @@ async def get_current_user(
         # It's generally better to use a logger here instead of print for production code
         print(f"Token: {credentials.credentials}")
         payload = decode_token(credentials.credentials)
-        user_id: str = payload.get("sub")
+        user_id: Optional[str] = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid user ID in token")
 
-        username: str = payload.get("username")
+        username: Optional[str] = payload.get("username")
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid username in token")
 
-        email: str = payload.get("email")
+        email: Optional[str] = payload.get("email")
         if email is None:
             raise HTTPException(status_code=401, detail="Invalid email in token")
 
-        return UserLoggedIn(id=user_id, username=username, email=email)
+        return UserLoggedIn(id=uuid.UUID(user_id), username=username, email=email)
     except jwt.ExpiredSignatureError as e:
         raise HTTPException(status_code=401, detail="Token has expired") from e
     except jwt.PyJWTError as e: # Catch other JWT errors
@@ -90,7 +91,7 @@ async def get_optional_current_user(
             # print("Token payload is missing required fields (sub, username, or email).") # Để gỡ lỗi
             return None # Trả về None thay vì raise HTTPException
 
-        return UserLoggedIn(id=user_id, username=username, email=email)
+        return UserLoggedIn(id=uuid.UUID(user_id), username=username, email=email)
 
     except jwt.ExpiredSignatureError:
         # Token đã hết hạn

@@ -53,6 +53,7 @@ class ThreadCRUD:
         await self.session.flush()
         await self.session.commit()
         await self.session.refresh(new_thread)
+
         return new_thread.id
     
         

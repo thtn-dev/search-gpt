@@ -1,7 +1,7 @@
 import uuid
 from pydantic import BaseModel
 from sqlmodel import  Column, DateTime, SQLModel, Field
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 from datetime import datetime
 from app.schemas.thread_schema import ContentItem, ContentMetadata, ContentStatus
 from app.utils.datetime_utils import utc_now
@@ -61,7 +61,7 @@ class MessageBase(SQLModel):
         sa_column=Column(DateTime(timezone=True), index=True)
     )
     
-    updated_by: Optional[str] = Field(default=None, index=None)
+    updated_by: Optional[str] = Field(default=None, index=False)
     
     format: str = Field()
     
@@ -74,5 +74,5 @@ class MessageBase(SQLModel):
     height: int = Field(default=0)
 
 class MessageModel(MessageBase, table=True):
-    __tablename__ = "messages"
+    __tablename__: ClassVar[str] = "messages" # type: ignore[assignment]
     id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)

@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import AsyncGenerator, List, Union, Callable # Thêm Callable
+from typing import AsyncGenerator, List, Optional, Union, Callable # Thêm Callable
 
 import orjson
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
@@ -19,6 +19,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 import secrets
 
 from app.services.auth_service import get_current_user, get_optional_current_user
+from backend.app.schemas.user_schema import UserLoggedIn
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -203,7 +204,7 @@ async def chat_stream_endpoint(
     # Background task sẽ tạo crud instance riêng.
     crud_for_request: ChatCRUD = Depends(ChatCRUD),
     # user_id: int = Depends(get_current_user_id) # Cần cơ chế xác thực người dùng thực tế
-    current_user = Depends(get_optional_current_user), 
+    current_user: Optional[UserLoggedIn] = Depends(get_optional_current_user), 
 ):
     """
     Xử lý các yêu cầu chat đến và truyền phát phản hồi.

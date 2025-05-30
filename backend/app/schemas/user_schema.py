@@ -116,7 +116,7 @@ class UserLoginResponse(BaseModel):
 
 class UserLoggedIn(SQLModel):
     """Schema representing the data of a currently logged-in user, typically from a token."""
-    id: int
+    id: UUID
     username: str
     email: EmailStr # Changed from str to EmailStr for consistency
 

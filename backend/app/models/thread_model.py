@@ -39,5 +39,5 @@ class ThreadBase(SQLModel):
     )
 
 class ThreadModel(ThreadBase, table=True):
-    __tablename__ = "threads"
+    __tablename__: ClassVar[str] = "threads" # type: ignore[assignment]
     id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
