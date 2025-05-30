@@ -1,3 +1,4 @@
+# type: ignore
 """
 Database session management for async operations.
 """

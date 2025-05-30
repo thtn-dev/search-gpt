@@ -12,7 +12,10 @@ from app.database.session import get_async_session
 from app.models.message_model import MessageModel, MessageRole
 from app.models.thread_model import ThreadModel
 from app.schemas.message_schema import MessageRequest
-from sqlmodel import select
+from sqlmodel import asc, desc, select
+
+from app.schemas.thread_schema import ContentMetadata
+from app.utils.datetime_utils import utc_now
 
 
 logger = logging.getLogger(__name__)
@@ -48,13 +51,15 @@ class ChatCRUD:
         result = await self.session.execute(statement)
         return result.scalars().first()
     
-    async def create_thread(self, user_id: int, title: Optional[str] = "New Thread") -> ThreadModel:
+    async def create_thread(self, user_id: uuid.UUID | None, title: Optional[str] = "New Thread") -> ThreadModel:
         """Create new thread."""
         effective_title = title if title and title.strip() else "New Thread"
 
         thread = ThreadModel(
             title=effective_title,
-            user_id=user_id
+            created_by=str(user_id) if user_id else None,
+            is_archived=False,
+            last_message_at=utc_now(),  # Set to None initially
         )
         self.session.add(thread)
         await self.session.flush() # use flush to get the ID before commit
@@ -80,7 +85,8 @@ class ChatCRUD:
             thread_id=thread_id,
             message_id=message_id,
             role=role,
-            message_metadata=message_metadata,
+            format="text",  
+            msg_metadata=ContentMetadata(custom=dict())
         )
         self.session.add(message)
         await self.session.flush() 
@@ -147,7 +153,7 @@ class ChatCRUD:
     async def save_human_message_and_ensure_thread(
         self,
         request_message: MessageRequest,
-        user_id: int,
+        user_id: uuid.UUID | None,
         human_message_id: str,
     ) -> MessageModel:
         """
@@ -217,7 +223,7 @@ class ChatCRUD:
         statement = (
             select(MessageModel)
             .where(MessageModel.thread_id == thread_id)
-            .order_by(MessageModel.created_at.asc()) # Sắp xếp tăng dần theo thời gian tạo
+            .order_by(asc(MessageModel.created_at))  
             .offset(offset)
             .limit(limit)
         )
@@ -230,8 +236,8 @@ class ChatCRUD:
         """Lấy danh sách các threads cho một user_id, sắp xếp theo thời gian tạo gần nhất."""
         statement = (
             select(ThreadModel)
-            .where(ThreadModel.user_id == user_id)
-            .order_by(ThreadModel.created_at.desc()) # Sắp xếp giảm dần, thread mới nhất lên đầu
+            .where(ThreadModel.created_by == user_id)
+            .order_by(desc(ThreadModel.created_at))
             .offset(offset)
             .limit(limit)
             # .options(selectinload(ThreadModel.messages)) # Ví dụ nếu muốn load cả messages (cẩn thận N+1)

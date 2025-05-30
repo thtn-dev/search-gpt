@@ -73,4 +73,4 @@ def get_settings() -> Settings:
         A Settings instance containing all application configuration
         loaded from YAML and environment variables.
     """
-    return Settings()
+    return Settings() # type: ignore

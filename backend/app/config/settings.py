@@ -38,4 +38,4 @@ class Settings(BaseSettings):
 # override=True ensures that .env variables take precedence over system environment variables
 load_dotenv(override=True, dotenv_path=Settings.Config.env_file)
 
-settings = Settings()
+settings = Settings() # type: ignore

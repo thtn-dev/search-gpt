@@ -18,8 +18,8 @@ from langchain.schema import HumanMessage, AIMessage, SystemMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 import secrets
 
+from app.schemas.user_schema import UserLoggedIn
 from app.services.auth_service import get_current_user, get_optional_current_user
-from backend.app.schemas.user_schema import UserLoggedIn
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -87,7 +87,7 @@ async def _generate_llm_stream_and_log(
                 content=final_ai_response,
                 thread_id_str=thread_id, # Đảm bảo thread_id là string
                 ai_message_id=ai_message_id,
-                session_factory=get_async_ctx_session # Truyền session factory
+                session_factory=get_async_ctx_session # type: ignore
             )
             logger.info(f"AI response for thread_id {thread_id} queued for saving. Length: {len(final_ai_response)}")
         elif not error_occurred:
@@ -285,7 +285,7 @@ async def get_threads_endpoint(
         )
 
 
-@router.get("/th/{thread_id}", status_code=status.HTTP_200_OK)
+@router.get("/thread/{thread_id}", status_code=status.HTTP_200_OK)
 async def get_thread_messages_endpoint(
     thread_id: str,
     crud: ChatCRUD = Depends(ChatCRUD),

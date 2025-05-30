@@ -1,6 +1,6 @@
 """SQLModel definitions for User and LinkedAccount entities."""
 from datetime import datetime
-from typing import List, Optional
+from typing import ClassVar, List, Optional
 import uuid
 from sqlalchemy.orm import Mapped
 from pydantic import EmailStr
@@ -43,7 +43,7 @@ class UserBase(SQLModel):
 
 class UserModel(UserBase, table=True):
     """Database model for users."""
-    __tablename__: ClassVar[str] = "users" # type: ignore[assignment]
+    __tablename__: ClassVar[str] = "users" 
     id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
 
     linked_accounts: Mapped[List["LinkedAccountModel"]] = Relationship(
@@ -54,7 +54,7 @@ class UserModel(UserBase, table=True):
 
 class LinkedAccountModel(SQLModel, table=True):
     """Database model for linking external OAuth provider accounts to a user."""
-    __tablename__: ClassVar[str] = "linked_accounts"  # type: ignore[assignment]    
+    __tablename__: ClassVar[str] = "linked_accounts"    
     
     id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
     
