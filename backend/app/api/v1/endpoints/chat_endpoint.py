@@ -1,6 +1,7 @@
 import asyncio
 import logging
-from typing import AsyncGenerator, List, Optional, Union, Callable # Thêm Callable
+from typing import AsyncGenerator, List, Optional, Union, Callable
+import uuid # Thêm Callable
 
 import orjson
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
@@ -20,6 +21,7 @@ import secrets
 
 from app.schemas.user_schema import UserLoggedIn
 from app.services.auth_service import get_current_user, get_optional_current_user
+from app.utils.uuid_utils import is_valid_uuid
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -294,8 +296,19 @@ async def get_thread_messages_endpoint(
     Lấy tất cả tin nhắn trong một thread cụ thể.
     """
     try:
+        thread_uuid_valid = is_valid_uuid(thread_id)
+        
+        if not thread_uuid_valid:
+            logger.error(f"Invalid thread_id format: {thread_id}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid thread ID format.",
+            )
+
+        thread_uuid = uuid.UUID(thread_id)
+        
         messages = await crud.get_messages_by_thread_id(
-            thread_id=thread_id,
+            thread_id=thread_uuid,
         )
         return messages
     except Exception as e:

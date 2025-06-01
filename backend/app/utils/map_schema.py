@@ -9,7 +9,7 @@ TSchema = TypeVar("TSchema", bound=BaseModel)
 TModel = TypeVar("TModel", bound=SQLModel)
 
 
-def map_models_schema(schema: TSchema, models: list[TModel]):
+def map_models_schema(schema: BaseModel, models: list[TModel]):
     """
     Map SQLModel to Pydantic schema.
     """

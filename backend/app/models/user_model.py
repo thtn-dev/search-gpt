@@ -15,7 +15,6 @@ from sqlmodel import (
 )
 
 from app.utils.datetime_utils import utc_now
-from app.utils.uuid6 import uuid6
 
 
 class UserBase(SQLModel):
@@ -44,7 +43,7 @@ class UserBase(SQLModel):
 class UserModel(UserBase, table=True):
     """Database model for users."""
     __tablename__: ClassVar[str] = "users" 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
 
     linked_accounts: Mapped[List["LinkedAccountModel"]] = Relationship(
         back_populates="user",
@@ -56,7 +55,7 @@ class LinkedAccountModel(SQLModel, table=True):
     """Database model for linking external OAuth provider accounts to a user."""
     __tablename__: ClassVar[str] = "linked_accounts"    
     
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
     
     user_id: uuid.UUID = Field(
         sa_column=Column(

@@ -3,9 +3,8 @@ from pydantic import BaseModel
 from sqlmodel import  Column, DateTime, SQLModel, Field, String, Text
 from typing import Any, ClassVar, Dict, List, Optional
 from datetime import datetime
-from app.schemas.thread_schema import ContentItem, ContentMetadata, ContentStatus
+from app.schemas.thread_schema import  ContentMetadata
 from app.utils.datetime_utils import utc_now
-from app.utils.uuid6 import uuid6
 from enum import Enum
 from sqlalchemy import types
 
@@ -67,4 +66,4 @@ class MessageBase(SQLModel):
 
 class MessageModel(MessageBase, table=True):
     __tablename__: ClassVar[str] = "messages" 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)

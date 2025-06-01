@@ -37,8 +37,6 @@ class ContentMetadata(BaseModel):
     steps: List[Step] | None = None
     custom: Dict[str, Any] | None = None
 
-
-# Định nghĩa schema cho đối tượng content (giữ nguyên)
 class RequestCreateMessageSchema(BaseModel):
     """
     Schema Pydantic chính cho cấu trúc request đầu vào.

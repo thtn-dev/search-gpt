@@ -5,7 +5,6 @@ import uuid
 from sqlmodel import JSON, SQLModel, Field, Column, DateTime
 
 from app.utils.datetime_utils import utc_now
-from app.utils.uuid6 import uuid6 
 
 class ThreadBase(SQLModel):
     title: str = Field(default=None, index=False)
@@ -38,4 +37,4 @@ class ThreadBase(SQLModel):
 
 class ThreadModel(ThreadBase, table=True):
     __tablename__: ClassVar[str] = "threads" 
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)

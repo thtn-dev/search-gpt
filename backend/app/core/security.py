@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from typing import Any, Dict, Tuple, Union
+import uuid
 import bcrypt
 from cryptography.fernet import Fernet
 import jwt
 
 from app.config.settings import  settings
-from app.utils.uuid6 import uuid6
-from backend.app.utils.datetime_utils import utc_now
+from app.utils.datetime_utils import utc_now
 
 fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
 JWT_ALGORITHM = "HS256"
@@ -20,7 +20,7 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta | Non
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    jti = uuid6()
+    jti = uuid.uuid4()
     iat = utc_now()
     nbf = iat
     to_encode = {"exp": expire, "sub": str(subject), "type": "access_token", "jti": str(jti), "iat": iat, "nbf": nbf}

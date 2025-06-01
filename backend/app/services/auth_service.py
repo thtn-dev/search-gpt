@@ -47,8 +47,6 @@ async def get_current_user(
     except jwt.PyJWTError as e: # Catch other JWT errors
         raise HTTPException(status_code=401, detail="Invalid token credentials") from e
     except Exception as e:
-        # Log the exception for debugging purposes
-        # logger.error(f"An unexpected error occurred during token decoding: {e}", exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error during authentication: {str(e)}"

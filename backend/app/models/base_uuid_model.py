@@ -3,14 +3,13 @@
 BaseUUIDModel
 This module defines a base model class for SQLModel that uses UUIDs as primary keys.
 """
-from uuid import UUID
+from uuid import UUID, uuid4
 from datetime import datetime
 from sqlmodel import SQLModel, Field
-from app.utils.uuid6 import uuid7
 
 class BaseUUIDModel(SQLModel):
     id: UUID = Field(
-        default_factory=uuid7,
+        default_factory=uuid4,
         primary_key=True,
         index=True,
         nullable=False,
