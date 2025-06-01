@@ -1,9 +1,26 @@
 import { Thread, Message } from '@/schemas/chat-schema';
-import { 
-  ApiMessage, 
-  CreateMessageRequest, 
-  CreateMessageResponse 
+import { getSession } from 'next-auth/react';
+import {
+  CreateMessageRequest,
+  CreateMessageResponse,
+  MessageRequestBase
 } from './types';
+
+type ThreadResponse = {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type MessageResponse = {
+  message_id: string;
+  thread_id: string;
+  content: string;
+  role: 'user' | 'assistant';
+  created_at: string;
+  updated_at: string;
+};
 
 const API_BASE_URL = 'http://localhost:8000';
 
@@ -24,40 +41,58 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
 };
 
 export const createThreadAsync = async (): Promise<{ thread_id: string }> => {
+  const session = await getSession();
+  console.log(session);
   const response = await fetch(`${API_BASE_URL}/v1/threads`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session?.user?.accessToken}`
     },
     body: JSON.stringify({
-      last_message_at: new Date().toISOString()
+      title: `Chat ${new Date().toLocaleString()}`
     })
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to create thread: ${response.status}`);
   }
-  
+
   const data = await response.json();
   return { thread_id: data.thread_id };
 };
 
 export const fetchThreads = async (): Promise<Thread[]> => {
-  const response = await apiRequest('/v1/threads');
-  return response.json();
+  const session = await getSession();
+  const response = await apiRequest('/v1/threads', {
+    headers: {
+      Authorization: `Bearer ${session?.user?.accessToken}`
+    }
+  });
+  const data = (await response.json()) as ThreadResponse[];
+  return data.map((thread) => ({
+    id: thread.id,
+    title: thread.title,
+    createdAt: new Date(thread.created_at),
+    updatedAt: new Date(thread.updated_at)
+  }));
 };
 
 export const fetchMessages = async (threadId: string): Promise<Message[]> => {
-  const response = await apiRequest(`/v1/threads/${threadId}/messages`);
-  const apiMessages: ApiMessage[] = await response.json();
+  const session = await getSession();
+  const response = await apiRequest(`/v1/threads/${threadId}/messages`, {
+    headers: {
+      Authorization: `Bearer ${session?.user?.accessToken}`
+    }
+  });
+  const apiMessages: MessageResponse[] = await response.json();
 
-  return apiMessages.map((apiMsg) => ({
-    id: apiMsg.id,
-    role: apiMsg.role as 'user' | 'assistant',
-    content: apiMsg.content.map((item) => item.text).join(''),
-    createdAt: new Date(apiMsg.created_at),
-    threadId: threadId,
-    parentId: apiMsg.parent_id
+  return apiMessages.map((msg) => ({
+    messageId: msg.message_id,
+    threadId: msg.thread_id,
+    content: msg.content,
+    role: msg.role,
+    createdAt: new Date(msg.created_at)
   }));
 };
 
@@ -65,29 +100,34 @@ export const createMessage = async (
   threadId: string,
   messageRequest: CreateMessageRequest
 ): Promise<CreateMessageResponse> => {
+  const session = await getSession();
   const response = await apiRequest(`/v1/threads/${threadId}/messages`, {
     method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session?.user?.accessToken}`
+    },
     body: JSON.stringify(messageRequest)
   });
-  
   return response.json();
 };
 
 export const streamChatResponse = async (
-  messages: Array<{ role: string; content: Array<{ type: string; text: string }> }>,
-  assistantMessageId: string
+  messageContent: MessageRequestBase,
+  history: Array<[string, string]>
 ): Promise<ReadableStreamDefaultReader<Uint8Array>> => {
   const chatRequest = {
-    messages,
-    tools: {},
-    unstable_assistantMessageId: assistantMessageId,
-    runConfig: {}
+    history,
+    system_instructions: 'You are a helpful assistant.',
+    message: messageContent
   };
+  const session = await getSession();
 
-  const chatResponse = await fetch('/api/chat', {
+  const chatResponse = await fetch(API_BASE_URL + '/v1/stream2', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session?.user?.accessToken}`
     },
     body: JSON.stringify(chatRequest)
   });

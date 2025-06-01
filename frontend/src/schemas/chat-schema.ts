@@ -1,10 +1,9 @@
 export type Message = {
-  id: string;
+  messageId?: string;
+  threadId?: string;
   role: 'user' | 'assistant';
   content: string;
   createdAt: Date;
-  threadId: string;
-  isStreaming?: boolean;
   parentId?: string;
 };
 

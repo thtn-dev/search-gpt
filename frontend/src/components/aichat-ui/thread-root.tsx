@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useParams } from 'next/navigation';
 import { ScrollArea } from '../ui/scroll-area';
 import { SidebarInset, SidebarProvider } from '../ui/sidebar';
 import Chat from './chat';
@@ -11,8 +12,16 @@ import { AppSidebar } from './sidebar/app-sidebar';
 import ThreadHeader from './thread-header';
 
 export function ThreadRoot() {
-  const { sendMessage } = useChatContext();
+  const params = useParams();
+  const threadId = (params.id as string) || null;
+  const { sendMessage, switchThread } = useChatContext();
   const thread = useCurrentThread();
+
+  React.useEffect(() => {
+    if (threadId) {
+      switchThread(threadId);
+    }
+  }, [threadId, switchThread]);
 
   return (
     <SidebarProvider>

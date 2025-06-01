@@ -1,19 +1,33 @@
 'use client';
 
-import React, { ReactNode, useReducer, createContext, useCallback } from 'react';
+import React, {
+  ReactNode,
+  useReducer,
+  createContext,
+  useCallback
+} from 'react';
 import { Message, Thread } from '@/schemas/chat-schema';
-import { ChatContextType, CreateMessageRequest } from './types';
-import { chatReducer, initialState } from './chat-reducer';
-import { 
-  createThreadAsync, 
-  fetchThreads, 
-  fetchMessages, 
+import crypto from 'crypto';
+import {
+  createThreadAsync,
+  fetchThreads,
+  fetchMessages,
   createMessage,
-  streamChatResponse 
+  streamChatResponse
 } from './api-service';
+import { chatReducer, initialState } from './chat-reducer';
 import { processStreamingResponse } from './streaming-service';
+import { ChatContextType, CreateMessageRequest } from './types';
 
-export const ChatContext = createContext<ChatContextType | undefined>(undefined);
+function genMessageId() {
+  const timestamp = Date.now() * 1000; // microseconds (approximate)
+  const hexPart = crypto.randomBytes(8).toString('hex');
+  return `${timestamp.toString(16)}-${hexPart}`;
+}
+
+export const ChatContext = createContext<ChatContextType | undefined>(
+  undefined
+);
 
 const FAKE_PARENT_ID = '00000000-0000-0000-0000-000000000000';
 
@@ -35,7 +49,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       console.error('Create thread error:', error);
       dispatch({
         type: 'SET_ERROR',
-        payload: error instanceof Error ? error.message : 'Failed to create thread'
+        payload:
+          error instanceof Error ? error.message : 'Failed to create thread'
       });
       return '';
     } finally {
@@ -53,7 +68,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       console.error('Load threads error:', error);
       dispatch({
         type: 'SET_ERROR',
-        payload: error instanceof Error ? error.message : 'Failed to load threads'
+        payload:
+          error instanceof Error ? error.message : 'Failed to load threads'
       });
     } finally {
       dispatch({ type: 'SET_LOADING_THREADS', payload: false });
@@ -65,146 +81,151 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     try {
       const messages = await fetchMessages(threadId);
-      const otherThreadMessages = state.messages.filter(
-        (msg) => msg.threadId !== threadId
-      );
+
       dispatch({
         type: 'SET_MESSAGES',
-        payload: [...otherThreadMessages, ...messages]
+        payload: messages
       });
     } catch (error) {
       console.error('Load messages error:', error);
       dispatch({
         type: 'SET_ERROR',
-        payload: error instanceof Error ? error.message : 'Failed to load messages'
+        payload:
+          error instanceof Error ? error.message : 'Failed to load messages'
       });
     } finally {
       dispatch({ type: 'SET_LOADING_MESSAGES', payload: false });
     }
-  }, [state.messages]);
+  }, []);
 
-  const switchThread = useCallback(async (threadId: string): Promise<void> => {
-    dispatch({ type: 'SET_CURRENT_THREAD', payload: threadId });
-    await loadMessages(threadId);
-  }, [loadMessages]);
+  const switchThread = useCallback(
+    async (threadId: string): Promise<void> => {
+      dispatch({ type: 'SET_CURRENT_THREAD', payload: threadId });
+      await loadMessages(threadId);
+    },
+    [loadMessages]
+  );
 
-  const sendMessage = useCallback(async (
-    content: string,
-    files: File[] = [],
-    threadId?: string
-  ): Promise<void> => {
-    const targetThreadId = threadId || state.currentThreadId;
-    console.log('files', files);
-    
-    if (!targetThreadId) {
-      throw new Error('No active thread');
-    }
+  const sendMessage = useCallback(
+    async (
+      content: string,
+      files: File[] = [],
+      threadId?: string
+    ): Promise<void> => {
+      const targetThreadId = threadId || state.currentThreadId;
+      console.log('files', files);
 
-    try {
-      // Create user message
-      const userMessageRequest: CreateMessageRequest = {
-        parent_id: FAKE_PARENT_ID,
-        format: 'markdown',
-        content: {
+      if (!targetThreadId) {
+        throw new Error('No active thread');
+      }
+
+      try {
+        // Create user message
+        const userMessageRequest: CreateMessageRequest = {
+          content,
+          thread_id: targetThreadId,
+          message_id: genMessageId(),
+          role: 'user'
+        };
+
+        const userResult = await createMessage(
+          targetThreadId,
+          userMessageRequest
+        );
+        const userMessage: Message = {
+          messageId: userResult.message_id,
           role: 'user',
-          content: [{ type: 'text', text: content }],
-          metadata: { custom: {} }
-        }
-      };
+          content,
+          createdAt: new Date(),
+          threadId: targetThreadId,
+          parentId: FAKE_PARENT_ID
+        };
 
-      const userResult = await createMessage(targetThreadId, userMessageRequest);
-      const userMessage: Message = {
-        id: userResult.message_id,
-        role: 'user',
-        content,
-        createdAt: new Date(),
-        threadId: targetThreadId,
-        parentId: FAKE_PARENT_ID
-      };
+        dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
 
-      dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
+        // Create temporary assistant message
+        const assistantMessageId = genMessageId();
+        const assistantMessage: Message = {
+          messageId: assistantMessageId,
+          role: 'assistant',
+          content: '',
+          createdAt: new Date(),
+          threadId: targetThreadId,
+          parentId: userResult.message_id
+        };
 
-      // Create temporary assistant message
-      const assistantMessageId = `temp-assistant-${Date.now()}`;
-      const assistantMessage: Message = {
-        id: assistantMessageId,
-        role: 'assistant',
-        content: '',
-        createdAt: new Date(),
-        threadId: targetThreadId,
-        parentId: userResult.message_id,
-        isStreaming: true
-      };
+        dispatch({ type: 'ADD_MESSAGE', payload: assistantMessage });
 
-      dispatch({ type: 'ADD_MESSAGE', payload: assistantMessage });
+        // Prepare messages for chat API
+        const threadMessages = state.messages
+          .filter((msg) => msg.threadId === targetThreadId)
+          .concat([userMessage]);
 
-      // Prepare messages for chat API
-      const threadMessages = state.messages
-        .filter((msg) => msg.threadId === targetThreadId)
-        .concat([userMessage]);
+        const history = threadMessages.map((msg) => [
+          msg.role,
+          msg.content
+        ]) as Array<[string, string]>;
 
-      const apiMessages = threadMessages.map((msg) => ({
-        role: msg.role,
-        content: [{ type: 'text', text: msg.content }]
-      }));
+        // Stream chat response
+        const reader = await streamChatResponse(
+          {
+            content: content,
+            message_id: userResult.message_id,
+            thread_id: targetThreadId
+          },
+          history
+        );
 
-      // Stream chat response
-      const reader = await streamChatResponse(apiMessages, assistantMessageId);
-      
-      const finalContent = await processStreamingResponse(reader, (streamingContent) => {
+        const finalContent = await processStreamingResponse(
+          reader,
+          (streamingContent) => {
+            dispatch({
+              type: 'UPDATE_MESSAGE',
+              payload: {
+                messageId: assistantMessageId,
+                content: streamingContent,
+                isStreaming: true
+              }
+            });
+          },
+          () => {},
+          () => {},
+          () => {},
+          true
+        );
+
+        // Save final assistant message to backend
+        const assistantMessageRequest: CreateMessageRequest = {
+          message_id: assistantMessageId,
+          thread_id: targetThreadId,
+          content: finalContent.content,
+          role: 'assistant'
+        };
+
+        await createMessage(targetThreadId, assistantMessageRequest);
+
+        // Update message to final state
         dispatch({
           type: 'UPDATE_MESSAGE',
           payload: {
-            id: assistantMessageId,
-            content: streamingContent,
-            isStreaming: true
+            messageId: assistantMessageId,
+            content: finalContent.content,
+            isStreaming: false
           }
         });
-      });
-
-      // Save final assistant message to backend
-      const assistantMessageRequest: CreateMessageRequest = {
-        parent_id: userResult.message_id,
-        format: 'markdown',
-        content: {
-          role: 'assistant',
-          content: [{ type: 'text', text: finalContent }],
-          metadata: {
-            unstable_annotations: [],
-            unstable_data: [],
-            steps: [{
-              state: 'finished',
-              finishReason: 'stop',
-              isContinued: false,
-              usage: {}
-            }],
-            custom: {}
-          }
-        }
-      };
-
-      await createMessage(targetThreadId, assistantMessageRequest);
-
-      // Update message to final state
-      dispatch({
-        type: 'UPDATE_MESSAGE',
-        payload: {
-          id: assistantMessageId,
-          content: finalContent,
-          isStreaming: false
-        }
-      });
-
-    } catch (error) {
-      console.error('Send message error:', error);
-      dispatch({
-        type: 'SET_ERROR',
-        payload: error instanceof Error ? error.message : 'Unknown error occurred'
-      });
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  }, [state.currentThreadId, state.messages]);
+      } catch (error) {
+        console.error('Send message error:', error);
+        dispatch({
+          type: 'SET_ERROR',
+          payload:
+            error instanceof Error ? error.message : 'Unknown error occurred'
+        });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    },
+    [state.currentThreadId, state.messages]
+  );
 
   const deleteThread = useCallback((threadId: string) => {
     dispatch({ type: 'DELETE_THREAD', payload: threadId });
@@ -216,12 +237,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const getCurrentThread = useCallback((): Thread | null => {
     if (!state.currentThreadId) return null;
-    return state.threads.find((thread) => thread.id === state.currentThreadId) || null;
+    return (
+      state.threads.find((thread) => thread.id === state.currentThreadId) ||
+      null
+    );
   }, [state.currentThreadId, state.threads]);
 
   const getCurrentMessages = useCallback((): Message[] => {
     if (!state.currentThreadId) return [];
-    return state.messages.filter((message) => message.threadId === state.currentThreadId);
+    return state.messages.filter(
+      (message) => message.threadId === state.currentThreadId
+    );
   }, [state.currentThreadId, state.messages]);
 
   const clearMessages = useCallback((threadId: string) => {
@@ -244,8 +270,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ChatContext.Provider value={contextValue}>
-      {children}
-    </ChatContext.Provider>
+    <ChatContext.Provider value={contextValue}>{children}</ChatContext.Provider>
   );
 }

@@ -37,18 +37,12 @@ class ContentMetadata(BaseModel):
     steps: List[Step] | None = None
     custom: Dict[str, Any] | None = None
 
-class RequestCreateMessageSchema(BaseModel):
-    """
-    Schema Pydantic chính cho cấu trúc request đầu vào.
-    Trường 'metadata' giờ đây hoàn toàn động.
-    """
-    parent_id: Optional[str] = None
-    thread_id: str
-    message_id: str
-    content: str
-    
-class ResponseCreateMessageSchema(BaseModel):
-    """
-    Schema Pydantic cho cấu trúc response đầu ra.
-    """
-    id: str
+class CreateThreadRequest(BaseModel):
+    title: Optional[str] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "title": "Hỗ trợ sản phẩm X"
+            }
+        }

@@ -1,19 +1,35 @@
+'use client';
+
 import React, { Fragment } from 'react';
 import { AuroraText } from '../magicui/aurora-text';
 import { useChatContext } from './context';
 import { MessageInput } from './message-input';
 
 export default function EmptyChat() {
-  const { sendMessage, createThread } = useChatContext();
+  const { sendMessage, createThread, loadThreads } = useChatContext();
+
+  React.useEffect(() => {
+    loadThreads();
+  }, [loadThreads]);
+
+  const changeUrlOnly = React.useCallback((tId: string) => {
+    window.history.pushState({ threadId: tId }, '', `/threads/${tId}`);
+  }, []);
 
   const handleSendFirstMessage = React.useCallback(
     async (message: string, files: File[]) => {
       // Create a new thread if it doesn't exist
       const tId = await createThread('New Thread');
-      // Send an initial message
+      if (!tId) {
+        console.error('Failed to create thread');
+        return;
+      }
+
+      // change the route to the new thread with out refreshing the page
+      changeUrlOnly(tId);
       sendMessage(message, files, tId);
     },
-    [sendMessage, createThread]
+    [changeUrlOnly, createThread, sendMessage]
   );
 
   return (

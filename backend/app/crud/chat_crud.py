@@ -94,6 +94,37 @@ class ChatCRUD:
         logger.info(f"Message saved: ID {message.id}, message_id {message_id}, role {role.value}, thread_id {thread_id}")
         return message
     
+    async def save_message_and_commit(
+        self,
+        content: str,
+        thread_id: uuid.UUID,
+        message_id: str,
+        role: MessageRole,
+        message_metadata: Optional[dict] = None,
+    ) -> MessageModel:
+        """
+        Save a message (Human or AI) to the database and commit the session.
+        This method is used for synchronous operations where the session should be committed immediately.
+        """
+        
+        if not thread_id:
+            logger.error("Attempted to save message with no thread_id.")
+            raise ValueError("thread_id is required to save a message.")
+
+        message = MessageModel(
+            content=content,
+            thread_id=thread_id,
+            message_id=message_id,
+            role=role,
+            format="text",  
+            msg_metadata=ContentMetadata(custom=dict()),
+        )
+        self.session.add(message)
+        await self.session.commit()
+        await self.session.refresh(message)
+        logger.info(f"Message saved and committed: ID {message.id}, message_id {message_id}, role {role.value}, thread_id {thread_id}")
+        return message
+    
     async def save_assistant_message(
         self,
         content: str,
@@ -108,48 +139,40 @@ class ChatCRUD:
         try:
             uuid_thread_id = uuid.UUID(thread_id)
             
-            # Thực hiện các thao tác cơ sở dữ liệu
-            # save_message thêm vào session, flush và refresh, nhưng không commit
             assistant_message_obj = await self.save_message(
                 content=content,
                 thread_id=uuid_thread_id,
                 message_id=ai_message_id,
                 role=MessageRole.ASSISTANT,
             )
-            
-            await self.session.commit() # Commit transaction
-            await self.session.refresh(assistant_message_obj) # Lấy trạng thái mới nhất sau commit
+            await self.session.commit() 
+            await self.session.refresh(assistant_message_obj) 
             logger.info(f"Assistant message {assistant_message_obj.id} (message_id: {ai_message_id}) committed for thread_id: {thread_id}")
             
         except Exception as e:
             logger.exception(f"Error during DB operations or commit for assistant message (thread_id {thread_id}, ai_message_id {ai_message_id}): {e}")
-            # Chỉ rollback nếu session đang trong một transaction và còn active
             if self.session.is_active:
                 try:
                     await self.session.rollback()
                     logger.info(f"Session rolled back for assistant message due to error (thread_id {thread_id})")
                 except Exception as rb_exc:
                     logger.exception(f"Error during rollback for assistant message (thread_id {thread_id}): {rb_exc}")
-            raise # Ném lại lỗi ban đầu để background task handler có thể xử lý
+            raise 
         finally:
-            # Đảm bảo session được đóng vì đây là background task
-            # và có thể không được quản lý bởi vòng đời session request-response thông thường của FastAPI.
-            if self.session: # Kiểm tra xem session có tồn tại không
+            if self.session: 
                 try:
                     await self.session.close()
                     logger.info(f"Session closed for assistant message task (thread_id {thread_id}, ai_message_id {ai_message_id})")
                 except Exception as close_exc:
-                    # Ghi log lỗi khi đóng session, nhưng không để nó che mất lỗi gốc (nếu có)
                     logger.exception(f"Error closing session for assistant message task (thread_id {thread_id}): {close_exc}")
         
         if assistant_message_obj is None:
-            # Trường hợp này không nên xảy ra nếu một exception đã được ném và xử lý ở tầng cao hơn.
-            # Nếu không có exception nhưng object là None, đó là một điều bất thường.
+           
             logger.error(f"assistant_message_obj is None after try-finally block for thread_id {thread_id} (ai_message_id: {ai_message_id}). This is unexpected if no error was re-raised.")
             raise Exception(f"Failed to save assistant message for thread_id {thread_id} due to an internal issue.")
             
         return assistant_message_obj
-        
+    
     async def save_human_message_and_ensure_thread(
         self,
         request_message: MessageRequest,
@@ -163,11 +186,12 @@ class ChatCRUD:
         Returns the message saved.
         """
         thread: Optional[ThreadModel] = None
+        
         final_thread_id: Optional[uuid.UUID] = None
 
-        if request_message.thread_id:
+        if request_message.message.thread_id:
             try:
-                parsed_thread_id = uuid.UUID(request_message.thread_id)
+                parsed_thread_id = uuid.UUID(request_message.message.thread_id)
                 thread = await self.get_thread_by_id(parsed_thread_id)
                 if thread:
                     # Kiểm tra xem thread có thuộc về user_id không (nếu cần)
@@ -178,15 +202,15 @@ class ChatCRUD:
                     final_thread_id = thread.id
                     logger.info(f"Using existing thread: {final_thread_id} for user_id: {user_id}")
                 else:
-                    logger.warning(f"Thread ID {request_message.thread_id} provided but not found. A new thread will be created.")
+                    logger.warning(f"Thread ID {request_message.message.thread_id} provided but not found. A new thread will be created.")
             except ValueError:
-                logger.warning(f"Invalid thread_id format: {request_message.thread_id}. A new thread will be created.")
+                logger.warning(f"Invalid thread_id format: {request_message.message.thread_id}. A new thread will be created.")
 
 
         if not thread: # Nếu không có thread_id hợp lệ hoặc thread không tìm thấy
             # Tạo title cho thread mới từ message đầu tiên (nếu có)
             # Hoặc để title mặc định
-            new_thread_title = request_message.message[:50] + "..." if request_message.message else "New Thread"
+            new_thread_title = request_message.message.content[:50] + "..." if request_message.message else "New Thread"
 
             thread = await self.create_thread(user_id=user_id, title=new_thread_title)
             final_thread_id = thread.id
@@ -199,7 +223,7 @@ class ChatCRUD:
 
 
         human_message = await self.save_message(
-            content=request_message.message,
+            content=request_message.message.content,
             thread_id=final_thread_id,
             message_id=human_message_id,
             role=MessageRole.USER,
@@ -231,12 +255,12 @@ class ChatCRUD:
         return list(result.scalars().all())
 
     async def get_threads_for_user(
-        self, user_id: int, limit: int = 50, offset: int = 0
+        self, user_id: uuid.UUID, limit: int = 50, offset: int = 0
     ) -> list[ThreadModel]:
         """Lấy danh sách các threads cho một user_id, sắp xếp theo thời gian tạo gần nhất."""
         statement = (
             select(ThreadModel)
-            .where(ThreadModel.created_by == user_id)
+            .where(ThreadModel.created_by == str(user_id))
             .order_by(desc(ThreadModel.created_at))
             .offset(offset)
             .limit(limit)

@@ -30,10 +30,11 @@ const UserMessageBox = ({
 export default function Chat() {
   const { state } = useChatContext();
   const currrentMessages = useCurrentMessages();
+
   return (
     <Fragment>
       {currrentMessages.map((message, index) => (
-        <Fragment key={message.id}>
+        <Fragment key={message.messageId}>
           {message.role === 'user' ? (
             <UserMessageBox message={message} messageIndex={index} />
           ) : (

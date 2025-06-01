@@ -14,10 +14,10 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
   switch (action.type) {
     case 'SET_LOADING':
       return { ...state, isLoading: action.payload };
-    
+
     case 'SET_LOADING_THREADS':
       return { ...state, isLoadingThreads: action.payload };
-    
+
     case 'SET_ERROR':
       return { ...state, error: action.payload };
 
@@ -58,7 +58,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       return {
         ...state,
         messages: state.messages.map((message) =>
-          message.id === action.payload.id
+          message.messageId === action.payload.messageId
             ? {
                 ...message,
                 content: action.payload.content,

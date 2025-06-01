@@ -1,49 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { Message, Thread } from '@/schemas/chat-schema';
 
-export type ApiContentItem = {
-  type: string;
-  text: string;
-};
-
-export type ApiContent = {
-  role: string;
-  content: ApiContentItem[];
-  metadata: {
-    custom?: Record<string, any>;
-    unstable_annotations?: any[];
-    unstable_data?: any[];
-    steps?: Array<{
-      state?: string;
-      messageId?: string;
-      finishReason?: string;
-      isContinued?: boolean;
-      usage?: {
-        promptTokens?: number;
-        completionTokens?: number;
-      };
-    }>;
-  };
+export type MessageRequestBase = {
+  message_id?: string;
+  thread_id?: string;
+  content: string;
 };
 
 export type CreateMessageRequest = {
-  parent_id?: string;
-  format: string;
-  content: ApiContent;
-};
+  role: 'user' | 'assistant';
+} & MessageRequestBase;
 
 export type CreateMessageResponse = {
   message_id: string;
-};
-
-export type ApiMessage = {
-  id: string;
-  role: string;
-  content: ApiContentItem[];
-  created_at: string;
-  parent_id?: string;
-  metadata?: any;
 };
 
 export type ChatState = {
@@ -67,7 +35,7 @@ export type ChatAction =
   | { type: 'ADD_MESSAGE'; payload: Message }
   | {
       type: 'UPDATE_MESSAGE';
-      payload: { id: string; content: string; isStreaming?: boolean };
+      payload: { messageId: string; content: string; isStreaming?: boolean };
     }
   | { type: 'SET_MESSAGES'; payload: Message[] }
   | { type: 'DELETE_THREAD'; payload: string }
