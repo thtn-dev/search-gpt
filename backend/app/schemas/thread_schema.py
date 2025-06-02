@@ -41,7 +41,7 @@ class CreateThreadRequest(BaseModel):
     title: Optional[str] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "title": "Hỗ trợ sản phẩm X"
             }
