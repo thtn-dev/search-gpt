@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.chat_crud import ChatCRUD
 from app.library.providers.gemini import load_gemini_chat_models
+from app.library.providers.openai import load_openai_chat_models
 from app.models.message_model import MessageRole 
 from app.schemas.message_schema import MessageCreateRequest, MessageRequest, gen_message_id
 from app.database.session import get_async_ctx_session
@@ -356,8 +357,8 @@ async def chat_stream_endpoint2(
     logger.info(f"Received message for /chat/stream. Message: {request.message.content[:100]}...")
     user_id = current_user.id if current_user else DEFAULT_USER_ID
 
-    models = load_gemini_chat_models()
-    llm_object = models.get("gemini-2.0-flash") # Đổi tên biến để tránh nhầm lẫn
+    models = load_openai_chat_models()
+    llm_object = models.get("gpt-4o-mini") # Đổi tên biến để tránh nhầm lẫn
 
     if not llm_object or not hasattr(llm_object, 'model') or not isinstance(llm_object.model, BaseChatModel):
         logger.error("LLM model ('gemini-2.0-flash') is not available or not a BaseChatModel instance.")

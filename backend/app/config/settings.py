@@ -1,4 +1,5 @@
 """Application configuration settings using Pydantic."""
+from functools import lru_cache
 import os
 from typing import Optional
 
@@ -39,3 +40,13 @@ class Settings(BaseSettings):
 load_dotenv(override=True, dotenv_path=Settings.Config.env_file)
 
 settings = Settings() # type: ignore
+
+@lru_cache()
+def get_settings() -> Settings:
+    """
+    Get the application settings.
+
+    Returns:
+        Settings: The application settings instance.
+    """
+    return Settings() # type: ignore

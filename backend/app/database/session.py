@@ -23,7 +23,7 @@ async_engine = create_async_engine(
     pool_recycle=3600,
     poolclass=AsyncAdaptedQueuePool,
     connect_args={
-        "ssl": False, 
+        # "ssl": False, 
     }
 )
 

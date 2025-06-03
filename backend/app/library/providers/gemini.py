@@ -2,13 +2,9 @@
 from langchain_google_genai import ChatGoogleGenerativeAI, HarmBlockThreshold, HarmCategory
 from pydantic import BaseModel
 from typing import Dict, List
-from langchain_core.language_models.chat_models import BaseChatModel
 
 from app.config import settings
-
-class ChatModel(BaseModel):
-    displayName: str
-    model: BaseChatModel
+from app.library.providers.core import ChatModel
 
 class GeminiChatModel(BaseModel):
     displayName: str
@@ -66,3 +62,4 @@ def load_gemini_chat_models() -> Dict[str, ChatModel]:
         return chat_models
     except Exception as e:
         raise ValueError(f"Failed to load Gemini chat models: {e}") from e
+    
