@@ -62,7 +62,8 @@ export const AUTH_OPTIONS: NextAuthOptions = {
             id: data.user.id,
             email: data.user.email,
             name: data.user.username,
-            accessToken: data.access_token
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token
           };
           return user;
         } catch (error) {
@@ -86,6 +87,7 @@ export const AUTH_OPTIONS: NextAuthOptions = {
       account?: Account | null;
       profile?: Profile;
     }): Promise<JWT> {
+      console.log('JWT Callback triggered', token);
       // `token` là JWT hiện tại của NextAuth.
       // `user` là đối tượng user trả về từ provider hoặc hàm authorize (chỉ có khi đăng nhập lần đầu).
       // `account` chứa thông tin từ provider (access_token, id_token, provider...) (chỉ có khi đăng nhập lần đầu).
@@ -97,11 +99,12 @@ export const AUTH_OPTIONS: NextAuthOptions = {
         console.log('Handling Credentials sign-in...');
         // User đã chứa FastAPI token từ hàm authorize
         const extendedUser = user as User;
-        token.accessToken = extendedUser.accessToken;
+        token.accessToken = extendedUser.accessToken || '';
         token.sub = extendedUser.id;
         token.email = extendedUser.email;
         token.name = extendedUser.name;
-        token.picture = extendedUser.image; // Nếu có
+        token.picture = extendedUser.image;
+        token.refreshToken = extendedUser.refreshToken || '';
         console.log('Stored FastAPI token from Credentials user into JWT.');
         return token;
       }
@@ -141,10 +144,10 @@ export const AUTH_OPTIONS: NextAuthOptions = {
         try {
           // Gọi đến endpoint FastAPI chung
           console.log(
-            `Calling FastAPI endpoint: ${appConfig.apiBaseUrl}/api/v1/auth/nextauth-signin`
+            `Calling FastAPI endpoint: ${appConfig.apiBaseUrl}/v1/auth/nextauth-signin`
           );
           const res = await axiosServer.post<LoginResponse>(
-            `${appConfig.apiBaseUrl}/api/v1/auth/nextauth-signin`, // Endpoint FastAPI chung
+            `${appConfig.apiBaseUrl}/v1/auth/nextauth-signin`, // Endpoint FastAPI chung
             backendPayload, // Body chứa provider và token tương ứng
             {
               headers: {
@@ -153,20 +156,20 @@ export const AUTH_OPTIONS: NextAuthOptions = {
             }
           );
 
-          const { access_token: accessToken, user: user2 } = res.data;
+          const {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+            user: user2
+          } = res.data;
           if (res.status === 200 && accessToken) {
             console.log(
               'FastAPI verification successful. Storing FastAPI token.'
             );
-
-            const tokenUser: User = {
-              id: user2.email,
-              email: user2.email,
-              name: user2.username,
-              image: '', // Có thể thêm ảnh nếu cầnJWT token out
-              accessToken: accessToken // Lưu access token từ FastAPI vào token
-            };
-            token.user = tokenUser;
+            token.sub = user2.id; // ID từ FastAPI
+            token.email = user2.email; // Email từ FastAPI
+            token.name = user2.username; // Tên từ FastAPI
+            token.accessToken = accessToken; // Lưu FastAPI token vào JWT
+            token.refreshToken = refreshToken; // Lưu Refresh token vào JWT
           }
           console.log('Stored FastAPI token and user info into NextAuth JWT.');
         } catch (error) {
@@ -187,6 +190,7 @@ export const AUTH_OPTIONS: NextAuthOptions = {
         session.user.email = token.email as string; // Email từ token
         session.user.accessToken = token.accessToken as string; // FastAPI token
         session.user.name = token.name as string; // Tên từ token
+        session.user.refreshToken = token.refreshToken as string; // Refresh token
       }
       return session;
     }

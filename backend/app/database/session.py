@@ -1,3 +1,4 @@
+# type: ignore
 """
 Database session management for async operations.
 """
@@ -21,6 +22,9 @@ async_engine = create_async_engine(
     pool_pre_ping=True,
     pool_recycle=3600,
     poolclass=AsyncAdaptedQueuePool,
+    connect_args={
+        # "ssl": False, 
+    }
 )
 
 AsyncSessionLocal = sessionmaker(

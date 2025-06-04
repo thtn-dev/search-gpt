@@ -1,45 +1,30 @@
 import uuid
 from pydantic import BaseModel
-from sqlmodel import  Column, DateTime, SQLModel, Field
-from typing import Any, Dict, List, Optional
+from sqlmodel import  Column, DateTime, SQLModel, Field, String, Text
+from typing import Any, ClassVar, Dict, List, Optional
 from datetime import datetime
-from app.schemas.thread_schema import ContentItem, ContentMetadata, ContentStatus
+from app.schemas.thread_schema import  ContentMetadata
 from app.utils.datetime_utils import utc_now
-from app.utils.uuid6 import uuid6
 from enum import Enum
 from sqlalchemy import types
 
 class MessageRole(str, Enum):
     USER = "user"
     ASSISTANT = "assistant"
-
-
-
-class Content(BaseModel):  # Pydantic model, not SQLModel
-    role: Optional[MessageRole] = None
-    content: List[ContentItem]
-    metadata: Optional[ContentMetadata] = None
-    status: Optional[ContentStatus] = None
-    
-    # Add method to convert to dict for storage
-    def to_json(self):
-        return self.model_dump()
-
-# Custom SQLAlchemy type for Content objects
-class ContentType(types.TypeDecorator):
+class ContentMetadataType(types.TypeDecorator):
     impl = types.JSON
 
-    def process_bind_param(self, value, dialect):
+    def process_bind_param(self, value: Optional[ContentMetadata], dialect) -> Optional[Dict[str, Any]]:
         if value is None:
             return None
-        if isinstance(value, Content):
-            return value.to_json()
+        if isinstance(value, ContentMetadata):
+            return value.model_dump()
         return value
-    
-    def process_result_value(self, value, dialect):
+
+    def process_result_value(self, value: Optional[Dict[str, Any]], dialect) -> Optional[ContentMetadata]:
         if value is None:
             return None
-        return Content(**value)
+        return ContentMetadata(**value)
 
 class MessageBase(SQLModel):
     
@@ -48,9 +33,14 @@ class MessageBase(SQLModel):
         sa_column=Column(DateTime(timezone=True), index=True)
     )
     
+    role: MessageRole = Field(
+        default=MessageRole.USER,
+        sa_column=Column(types.Enum(MessageRole), index=True, nullable=False)
+    )
+    
     thread_id: Optional[uuid.UUID] = Field(default=None, index=True)
     
-    message_id: Optional[str] = Field(default=None, index=True)
+    message_id: Optional[str] = Field(default=None, index=False)
     
     parent_id: Optional[str] = Field(default=None, index=True)
     
@@ -61,18 +51,19 @@ class MessageBase(SQLModel):
         sa_column=Column(DateTime(timezone=True), index=True)
     )
     
-    updated_by: Optional[str] = Field(default=None, index=None)
+    updated_by: Optional[str] = Field(default=None, index=False)
+    
+    msg_metadata: ContentMetadata = Field(
+        default=None,
+        sa_column=Column(ContentMetadataType, nullable=True, index=False)
+    )
     
     format: str = Field()
     
-    content: Optional[Content] = Field(
-        default=None,
-        sa_column=Column(ContentType),
-        description="Content as JSON, may be NULL."
-    )
-    
+    content: str = Field(
+        sa_column=Column(Text, nullable=False, index=False))
     height: int = Field(default=0)
 
 class MessageModel(MessageBase, table=True):
-    __tablename__ = "messages"
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    __tablename__: ClassVar[str] = "messages" 
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)

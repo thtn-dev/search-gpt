@@ -2,7 +2,7 @@ import React from 'react';
 import ThemeSwitcher from '../theme-switcher';
 import { Separator } from '../ui/separator';
 import { SidebarTrigger } from '../ui/sidebar';
-import { useCurrentThread } from './context/thread-context';
+import { useCurrentThread } from './context';
 
 export default function ThreadHeader() {
   const thread = useCurrentThread();

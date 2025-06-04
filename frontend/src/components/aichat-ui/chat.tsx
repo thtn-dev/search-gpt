@@ -3,7 +3,7 @@
 import React, { Fragment } from 'react';
 import { Message } from '@/schemas/chat-schema';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { useChatContext, useCurrentMessages } from './context/thread-context';
+import { useChatContext, useCurrentMessages } from './context';
 import MessageBox from './message-box';
 
 const UserMessageBox = ({
@@ -30,10 +30,11 @@ const UserMessageBox = ({
 export default function Chat() {
   const { state } = useChatContext();
   const currrentMessages = useCurrentMessages();
+
   return (
     <Fragment>
       {currrentMessages.map((message, index) => (
-        <Fragment key={message.id}>
+        <Fragment key={message.messageId}>
           {message.role === 'user' ? (
             <UserMessageBox message={message} messageIndex={index} />
           ) : (

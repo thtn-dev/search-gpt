@@ -1,10 +1,10 @@
 """Pydantic models (schemas) for user-related data validation and serialization."""
 import re
 from typing import Annotated, Optional
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlmodel import SQLModel
-
 
 class UserCreate(SQLModel):
     """
@@ -69,54 +69,25 @@ class UserLogin(BaseModel):
 
 class UserBase(SQLModel):
     """Base user schema with core user information."""
-    id: int
+    id: UUID
     username: str
-    email: EmailStr # Changed from str to EmailStr for consistency
+    email: EmailStr 
     is_active: bool
-
-    # model_config = {
-    #     "alias_generator": to_camel, # This would require to_camel to be imported
-    #     "populate_by_name": True,
-    #     "json_schema_extra": {
-    #         "example": {
-    #             "id": 1,
-    #             "username": "string",
-    #             "email": "user@example.com",
-    #             "isActive": True
-    #         }
-    #     }
-    # }
-
+    
 
 class UserLoginResponse(BaseModel):
     """Response model for user login, including token and user details."""
     access_token: str
+    refresh_token: str
     token_type: str = "Bearer"
     user: UserBase
-
-    # model_config = {
-    #     "alias_generator": to_camel, # This would require to_camel to be imported
-    #     "populate_by_name": True,
-    #     "json_schema_extra": {
-    #         "example": {
-    #             "accessToken": "your_access_token_here",
-    #             "tokenType": "Bearer",
-    #             "user": {
-    #                 "id": 1,
-    #                 "username": "johndoe",
-    #                 "email": "johndoe@example.com",
-    #                 "isActive": True
-    #             }
-    #         }
-    #     }
-    # }
 
 
 class UserLoggedIn(SQLModel):
     """Schema representing the data of a currently logged-in user, typically from a token."""
-    id: int
+    id: UUID
     username: str
-    email: EmailStr # Changed from str to EmailStr for consistency
+    email: EmailStr 
 
 
 class GoogleTokenData(BaseModel):
@@ -126,10 +97,9 @@ class GoogleTokenData(BaseModel):
 
 class TokenPayload(BaseModel):
     """Payload data contained within our application's JWT."""
-    sub: str  # Subject (usually user ID)
-    # Add other claims if needed, e.g., username, email, roles
-    username: Optional[str] = None # Added for clarity if including in token
-    email: Optional[EmailStr] = None    # Added for clarity if including in token
+    sub: str 
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None   
 
 
 class TokenResponse(BaseModel):

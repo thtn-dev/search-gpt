@@ -1,27 +1,27 @@
 from datetime import datetime, timedelta
-from typing import Any, Dict, Union
+from typing import Any, Dict, Tuple, Union
+import uuid
 import bcrypt
 from cryptography.fernet import Fernet
 import jwt
 
 from app.config.settings import  settings
-from app.utils.uuid6 import uuid6
+from app.utils.datetime_utils import utc_now
 
 fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
-
 JWT_ALGORITHM = "HS256"
 
 
-def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None, additional_claims: Dict[str, Any] = None) -> str:
+def create_access_token(subject: Union[str, Any], expires_delta: timedelta | None = None, additional_claims: Dict[str, Any] | None = None) -> str:
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = utc_now() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
         )
 
-    jti = uuid6()
-    iat = datetime.utcnow()
+    jti = uuid.uuid4()
+    iat = utc_now()
     nbf = iat
     to_encode = {"exp": expire, "sub": str(subject), "type": "access_token", "jti": str(jti), "iat": iat, "nbf": nbf}
 
@@ -37,11 +37,11 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta = Non
 
 
 
-def create_refresh_token(subject: str | Any, expires_delta: timedelta = None) -> str:
+def create_refresh_token(subject: str | Any, expires_delta: timedelta | None = None) -> str:
     if expires_delta:
-        expire = datetime.utcnow() + expires_delta
+        expire = utc_now() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(
+        expire = utc_now() + timedelta(
             minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
         )
     to_encode = {"exp": expire, "sub": str(subject), "type": "refresh"}

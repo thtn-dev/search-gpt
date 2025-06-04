@@ -1,8 +1,8 @@
 """SQLModel definitions for User and LinkedAccount entities."""
 from datetime import datetime
-from typing import List, Optional
+from typing import ClassVar, List, Optional
 import uuid
-
+from sqlalchemy.orm import Mapped
 from pydantic import EmailStr
 from sqlmodel import (
     Column,
@@ -15,7 +15,6 @@ from sqlmodel import (
 )
 
 from app.utils.datetime_utils import utc_now
-from app.utils.uuid6 import uuid6
 
 
 class UserBase(SQLModel):
@@ -43,10 +42,10 @@ class UserBase(SQLModel):
 
 class UserModel(UserBase, table=True):
     """Database model for users."""
-    __tablename__ = "users"
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    __tablename__: ClassVar[str] = "users" 
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
 
-    linked_accounts: List["LinkedAccountModel"] = Relationship(
+    linked_accounts: Mapped[List["LinkedAccountModel"]] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"}
     )
@@ -54,9 +53,9 @@ class UserModel(UserBase, table=True):
 
 class LinkedAccountModel(SQLModel, table=True):
     """Database model for linking external OAuth provider accounts to a user."""
-    __tablename__ = "linked_accounts"
+    __tablename__: ClassVar[str] = "linked_accounts"    
     
-    id: Optional[uuid.UUID] = Field(default_factory=uuid6, primary_key=True)
+    id: Optional[uuid.UUID] = Field(default_factory=uuid.uuid4, primary_key=True)
     
     user_id: uuid.UUID = Field(
         sa_column=Column(
@@ -77,7 +76,7 @@ class LinkedAccountModel(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), index=True)
     )
 
-    user: Optional[UserModel] = Relationship(back_populates="linked_accounts")
+    user: Mapped[UserModel | None] = Relationship(back_populates="linked_accounts")
 
     __table_args__ = (
         UniqueConstraint("provider", "provider_key", name="uq_provider_provider_key"),

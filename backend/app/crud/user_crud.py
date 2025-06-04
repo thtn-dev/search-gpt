@@ -111,11 +111,17 @@ class UserCRUD:
                 None
             )
             return existing_link # type: ignore # Assuming existing_link will be found if has_link is True
+        if user.id is None:
+            logger.error(
+                "Cannot link provider '%s' to User ID: %s because user ID is None.",
+                provider.value, user.id
+            )
+            raise ValueError("User ID cannot be None when linking a provider.")
 
         new_linked_account = LinkedAccountModel(
             provider=provider.value,
             provider_key=provider_key,
-            user_id=user.id
+            user_id=user.id 
         )
         self.session.add(new_linked_account)
 
@@ -194,14 +200,22 @@ class UserCRUD:
             username=username,
             hashed_password=None,
             is_active=True,
-            # full_name=user_info.name # Add if in model
         )
+
+        self.session.add(new_user)
+        await self.session.flush()  
+
+        if not new_user.id:
+            logger.error("Failed to create new user, user ID is None.")
+            raise ValueError("Failed to create new user, user ID is None.")
+
         new_linked_account = LinkedAccountModel(
+            user_id=new_user.id, 
             provider=user_info.provider.value,
             provider_key=str(user_info.provider_key),
         )
-        new_user.linked_accounts.append(new_linked_account)
-        self.session.add(new_user)
+
+        self.session.add(new_linked_account)
 
         try:
             await self.session.flush()
