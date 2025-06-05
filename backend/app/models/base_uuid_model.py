@@ -1,11 +1,13 @@
-
 """
 BaseUUIDModel
 This module defines a base model class for SQLModel that uses UUIDs as primary keys.
 """
-from uuid import UUID, uuid4
+
 from datetime import datetime
-from sqlmodel import SQLModel, Field
+from uuid import UUID, uuid4
+
+from sqlmodel import Field, SQLModel
+
 
 class BaseUUIDModel(SQLModel):
     id: UUID = Field(
@@ -15,6 +17,6 @@ class BaseUUIDModel(SQLModel):
         nullable=False,
     )
     updated_at: datetime | None = Field(
-        default_factory=datetime.utcnow, sa_column_kwargs={"onupdate": datetime.utcnow}
+        default_factory=datetime.utcnow, sa_column_kwargs={'onupdate': datetime.utcnow}
     )
     created_at: datetime | None = Field(default_factory=datetime.utcnow)

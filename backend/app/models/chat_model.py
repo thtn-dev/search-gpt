@@ -1,6 +1,9 @@
-from pydantic import BaseModel
 from typing import List, Optional
+
+from pydantic import BaseModel
+
 from app.config.gemini_settings import DEFAULT_SYSTEM_PROMPT
+
 
 class FileData(BaseModel):
     """Model for a file with base64 data and MIME type.

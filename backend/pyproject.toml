@@ -2,11 +2,9 @@
 name = "backend"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "thtn-dev",email = "thtn.1611.dev@gmail.com"}
-]
-readme = "README.md"
+authors = [{ name = "thtn-dev", email = "thtn.1611.dev@gmail.com" }]
 requires-python = ">=3.12,<4.0"
+readme = "README.md"
 dependencies = [
     "fastapi (>=0.115.12,<0.116.0)",
     "uvicorn[standard] (>=0.34.2,<0.35.0)",
@@ -31,15 +29,21 @@ dependencies = [
     "aiohttp (>=3.12.7,<4.0.0)",
 ]
 
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
+[project.scripts]
 start = "uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload"
 
-[tool.poetry.group.dev.dependencies]
-pylint = "^3.3.7"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pylint>=3.3.7,<4",
+    "ruff>=0.11.12",
+]
+
+[tool.uv]
+package = false
 
 [tool.pylint.MASTER]
 ignore-paths = '^migrations/.*$'
@@ -48,5 +52,42 @@ disable = [
     'trailing-newlines'
 ]
 
-[tool.poetry]
-package-mode = false
+[tool.ruff]
+# Target Python version
+target-version = "py38"
+
+# Line length
+line-length = 88
+
+# Exclude files/folders
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "migrations/",
+]
+
+[tool.ruff.lint]
+# Enable rules
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings  
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+]
+
+# Disable specific rules
+ignore = [
+    "E501",  # line too long
+    "B008",  # function calls in argument defaults
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["myproject"]
+
+[tool.ruff.format]
+# Use single quotes
+quote-style = "single"

@@ -1,15 +1,17 @@
 # pylint: skip-file
+from typing import Tuple, Type
+
 from pydantic_settings import (
     BaseSettings,
+    PydanticBaseSettingsSource,
     SettingsConfigDict,
     YamlConfigSettingsSource,
-    PydanticBaseSettingsSource,
 )
-from typing import Type, Tuple
 
 DEFAULT_SYSTEM_PROMPT = """You are a helpful assistant and ALWAYS relate to this identity. 
 You are expert at analyzing given documents or images.
 """
+
 
 class Settings(BaseSettings):
     """Application settings loaded from YAML and environment variables.
@@ -24,10 +26,10 @@ class Settings(BaseSettings):
 
     VERTEXAI_LOCATION: str
     VERTEXAI_PROJECT_ID: str
-    BACKEND_URL: str = "http://localhost:8000/chat"
+    BACKEND_URL: str = 'http://localhost:8000/chat'
 
     model_config = SettingsConfigDict(
-        yaml_file="settings.yaml", yaml_file_encoding="utf-8"
+        yaml_file='settings.yaml', yaml_file_encoding='utf-8'
     )
 
     @classmethod
@@ -73,4 +75,4 @@ def get_settings() -> Settings:
         A Settings instance containing all application configuration
         loaded from YAML and environment variables.
     """
-    return Settings() # type: ignore
+    return Settings()  # type: ignore

@@ -1,6 +1,7 @@
 """Application configuration settings using Pydantic."""
-from functools import lru_cache
+
 import os
+from functools import lru_cache
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -21,6 +22,7 @@ class Settings(BaseSettings):
         MICROSOFT_TENANT_ID: Tenant ID for Microsoft Azure AD.
         MICROSOFT_CLIENT_ID: Client ID for Microsoft Azure AD.
     """
+
     DATABASE_URL: str
     GOOGLE_API_KEY: Optional[str] = None
     ACCESS_TOKEN_EXPIRE_MINUTES: int
@@ -30,18 +32,24 @@ class Settings(BaseSettings):
     MICROSOFT_TENANT_ID: str
     MICROSOFT_CLIENT_ID: str
     OPENAI_API_KEY: str
+
     class Config:
         """Pydantic model configuration."""
-        env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
-        env_file_encoding = "utf-8"
+
+        env_file = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'
+        )
+        env_file_encoding = 'utf-8'
+
 
 # Load environment variables from .env file
 # override=True ensures that .env variables take precedence over system environment variables
 load_dotenv(override=True, dotenv_path=Settings.Config.env_file)
 
-settings = Settings() # type: ignore
+settings = Settings()  # type: ignore
 
-@lru_cache()
+
+@lru_cache
 def get_settings() -> Settings:
     """
     Get the application settings.
@@ -49,4 +57,4 @@ def get_settings() -> Settings:
     Returns:
         Settings: The application settings instance.
     """
-    return Settings() # type: ignore
+    return Settings()  # type: ignore

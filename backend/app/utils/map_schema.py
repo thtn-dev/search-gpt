@@ -2,11 +2,12 @@
 """Mapping utility for converting SQLModel instances to Pydantic schemas."""
 
 from typing import TypeVar
+
 from pydantic import BaseModel
 from sqlmodel import SQLModel
 
-TSchema = TypeVar("TSchema", bound=BaseModel)
-TModel = TypeVar("TModel", bound=SQLModel)
+TSchema = TypeVar('TSchema', bound=BaseModel)
+TModel = TypeVar('TModel', bound=SQLModel)
 
 
 def map_models_schema(schema: BaseModel, models: list[TModel]):

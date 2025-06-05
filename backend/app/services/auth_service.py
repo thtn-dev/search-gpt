@@ -1,17 +1,20 @@
 """Authentication service to handle user authorization."""
-from typing import Optional
+
 import uuid
-from fastapi import HTTPException, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Optional
+
 import jwt
+from fastapi import HTTPException, Security
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from app.core.security import decode_token
+
 # Assuming UserLoggedIn is defined in auth_schemas, adjust if necessary
 from app.schemas.user_schema import UserLoggedIn
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Security(HTTPBearer())
+    credentials: HTTPAuthorizationCredentials = Security(HTTPBearer()),
 ) -> UserLoggedIn:
     """
     Decodes the JWT token from the Authorization header and returns the logged-in user.
@@ -27,36 +30,39 @@ async def get_current_user(
     """
     try:
         # It's generally better to use a logger here instead of print for production code
-        print(f"Token: {credentials.credentials}")
+        print(f'Token: {credentials.credentials}')
         payload = decode_token(credentials.credentials)
-        user_id: Optional[str] = payload.get("sub")
+        user_id: Optional[str] = payload.get('sub')
         if user_id is None:
-            raise HTTPException(status_code=401, detail="Invalid user ID in token")
+            raise HTTPException(status_code=401, detail='Invalid user ID in token')
 
-        username: Optional[str] = payload.get("username")
+        username: Optional[str] = payload.get('username')
         if username is None:
-            raise HTTPException(status_code=401, detail="Invalid username in token")
+            raise HTTPException(status_code=401, detail='Invalid username in token')
 
-        email: Optional[str] = payload.get("email")
+        email: Optional[str] = payload.get('email')
         if email is None:
-            raise HTTPException(status_code=401, detail="Invalid email in token")
+            raise HTTPException(status_code=401, detail='Invalid email in token')
 
         return UserLoggedIn(id=uuid.UUID(user_id), username=username, email=email)
     except jwt.ExpiredSignatureError as e:
-        raise HTTPException(status_code=401, detail="Token has expired") from e
-    except jwt.PyJWTError as e: # Catch other JWT errors
-        raise HTTPException(status_code=401, detail="Invalid token credentials") from e
+        raise HTTPException(status_code=401, detail='Token has expired') from e
+    except jwt.PyJWTError as e:  # Catch other JWT errors
+        raise HTTPException(status_code=401, detail='Invalid token credentials') from e
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Internal server error during authentication: {str(e)}"
+            detail=f'Internal server error during authentication: {str(e)}',
         ) from e
+
 
 async def get_optional_current_user(
     # Sử dụng optional_http_bearer.
     # auth sẽ là None nếu không có header "Authorization" hoặc header không đúng định dạng Bearer.
-    auth: Optional[HTTPAuthorizationCredentials] = Security(HTTPBearer(auto_error=False))
-) -> Optional[UserLoggedIn]: # Kiểu trả về bây giờ là Optional[UserLoggedIn]
+    auth: Optional[HTTPAuthorizationCredentials] = Security(
+        HTTPBearer(auto_error=False)
+    ),
+) -> Optional[UserLoggedIn]:  # Kiểu trả về bây giờ là Optional[UserLoggedIn]
     """
     Optionally decodes the JWT token from the Authorization header.
     If a valid token is present, returns the logged-in user.
@@ -77,28 +83,30 @@ async def get_optional_current_user(
     token = auth.credentials
     try:
         # print(f"Attempting to decode token: {token[:20]}...") # Để gỡ lỗi, chỉ hiển thị một phần token
-        payload = decode_token(token) # Hàm này nên raise jwt.ExpiredSignatureError hoặc jwt.PyJWTError nếu token có vấn đề
+        payload = decode_token(
+            token
+        )  # Hàm này nên raise jwt.ExpiredSignatureError hoặc jwt.PyJWTError nếu token có vấn đề
 
-        user_id: Optional[str] = payload.get("sub")
-        username: Optional[str] = payload.get("username")
-        email: Optional[str] = payload.get("email")
+        user_id: Optional[str] = payload.get('sub')
+        username: Optional[str] = payload.get('username')
+        email: Optional[str] = payload.get('email')
 
         if not user_id or not username or not email:
             # Nếu một trong các trường bắt buộc bị thiếu trong payload,
             # coi như token không hợp lệ cho mục đích này.
             # print("Token payload is missing required fields (sub, username, or email).") # Để gỡ lỗi
-            return None # Trả về None thay vì raise HTTPException
+            return None  # Trả về None thay vì raise HTTPException
 
         return UserLoggedIn(id=uuid.UUID(user_id), username=username, email=email)
 
     except jwt.ExpiredSignatureError:
         # Token đã hết hạn
         # print("Token has expired.") # Để gỡ lỗi
-        return None # Trả về None
-    except jwt.PyJWTError as e:
+        return None  # Trả về None
+    except jwt.PyJWTError:
         # Lỗi JWT khác (ví dụ: token không hợp lệ, chữ ký sai)
         # print(f"Invalid token credentials: {e}") # Để gỡ lỗi
-        return None # Trả về None
+        return None  # Trả về None
     except Exception as e:
         # Ghi log lỗi này cho mục đích gỡ lỗi vì đây là lỗi không mong muốn
         # logger.error(f"An unexpected error occurred during optional token decoding: {e}", exc_info=True)
@@ -108,5 +116,5 @@ async def get_optional_current_user(
         # việc raise lỗi 500 vẫn hợp lý để thông báo về sự cố ở phía máy chủ.
         raise HTTPException(
             status_code=500,
-            detail=f"Internal server error during optional authentication: {str(e)}"
+            detail=f'Internal server error during optional authentication: {str(e)}',
         ) from e

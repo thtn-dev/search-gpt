@@ -1,18 +1,23 @@
-from datetime import datetime, timedelta
-from typing import Any, Dict, Tuple, Union
 import uuid
-import bcrypt
-from cryptography.fernet import Fernet
-import jwt
+from datetime import datetime, timedelta
+from typing import Any, Dict, Union
 
-from app.config.settings import  settings
+import bcrypt
+import jwt
+from cryptography.fernet import Fernet
+
+from app.config.settings import settings
 from app.utils.datetime_utils import utc_now
 
 fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
-JWT_ALGORITHM = "HS256"
+JWT_ALGORITHM = 'HS256'
 
 
-def create_access_token(subject: Union[str, Any], expires_delta: timedelta | None = None, additional_claims: Dict[str, Any] | None = None) -> str:
+def create_access_token(
+    subject: Union[str, Any],
+    expires_delta: timedelta | None = None,
+    additional_claims: Dict[str, Any] | None = None,
+) -> str:
     if expires_delta:
         expire = utc_now() + expires_delta
     else:
@@ -23,7 +28,14 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta | Non
     jti = uuid.uuid4()
     iat = utc_now()
     nbf = iat
-    to_encode = {"exp": expire, "sub": str(subject), "type": "access_token", "jti": str(jti), "iat": iat, "nbf": nbf}
+    to_encode = {
+        'exp': expire,
+        'sub': str(subject),
+        'type': 'access_token',
+        'jti': str(jti),
+        'iat': iat,
+        'nbf': nbf,
+    }
 
     # Thêm các claims tùy chọn nếu chúng được cung cấp
     if additional_claims:
@@ -36,15 +48,14 @@ def create_access_token(subject: Union[str, Any], expires_delta: timedelta | Non
     )
 
 
-
-def create_refresh_token(subject: str | Any, expires_delta: timedelta | None = None) -> str:
+def create_refresh_token(
+    subject: str | Any, expires_delta: timedelta | None = None
+) -> str:
     if expires_delta:
         expire = utc_now() + expires_delta
     else:
-        expire = utc_now() + timedelta(
-            minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES
-        )
-    to_encode = {"exp": expire, "sub": str(subject), "type": "refresh"}
+        expire = utc_now() + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+    to_encode = {'exp': expire, 'sub': str(subject), 'type': 'refresh'}
 
     return jwt.encode(
         payload=to_encode,

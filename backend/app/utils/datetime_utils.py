@@ -1,4 +1,5 @@
-from datetime import datetime, timezone # Thêm 'timezone'
+from datetime import datetime, timezone  # Thêm 'timezone'
+
 
 def utc_now():
     """Return the current UTC datetime."""

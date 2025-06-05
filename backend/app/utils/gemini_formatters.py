@@ -1,11 +1,14 @@
-""""
+""" "
 Module supporting the conversion of chat history to Google Gemini format.
 """
 
 import base64
 from typing import List
+
 from google.genai.types import Content, Part
-from app.models.chat_model import Message, FileData
+
+from app.models.chat_model import FileData, Message
+
 
 def handle_multimodal_data(file_data: FileData) -> Part:
     """Converts Multimodal data to a Google Gemini Part object.
@@ -18,6 +21,7 @@ def handle_multimodal_data(file_data: FileData) -> Part:
     """
     data = base64.b64decode(file_data.data)  # decode base64 string to bytes
     return Part.from_bytes(data=data, mime_type=file_data.mime_type)
+
 
 def format_message_history_to_gemini_standard(
     message_history: List[Message],
@@ -36,15 +40,15 @@ def format_message_history_to_gemini_standard(
     """
     converted_messages: List[Content] = []
     for message in message_history:
-        if message.role == "assistant":
+        if message.role == 'assistant':
             converted_messages.append(
-                Content(role="model", parts=[Part.from_text(text=message.content)])
+                Content(role='model', parts=[Part.from_text(text=message.content)])
             )
-        elif message.role == "user":
+        elif message.role == 'user':
             # Text-only messages
             if isinstance(message.content, str):
                 converted_messages.append(
-                    Content(role="user", parts=[Part.from_text(text=message.content)])
+                    Content(role='user', parts=[Part.from_text(text=message.content)])
                 )
 
             # Messages with files
@@ -56,12 +60,12 @@ def format_message_history_to_gemini_standard(
 
                 # Add the parts to a Content object
                 if parts:
-                    converted_messages.append(Content(role="user", parts=parts))
+                    converted_messages.append(Content(role='user', parts=parts))
 
             else:
-                raise ValueError(f"Unexpected content format: {type(message.content)}")
+                raise ValueError(f'Unexpected content format: {type(message.content)}')
 
         else:
-            raise ValueError(f"Unknown role: {message.role}")
+            raise ValueError(f'Unknown role: {message.role}')
 
     return converted_messages

@@ -2,23 +2,24 @@
 CRUD operations for chat messages.
 This module provides functions to create, read, update, and delete chat messages.
 """
+
 import logging
-from typing import Optional
 import uuid
+from typing import Optional
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import asc, desc, select
+
 from app.database.session import get_async_session
 from app.models.message_model import MessageModel, MessageRole
 from app.models.thread_model import ThreadModel
 from app.schemas.message_schema import MessageRequest
-from sqlmodel import asc, desc, select
-
 from app.schemas.thread_schema import ContentMetadata
 from app.utils.datetime_utils import utc_now
 
-
 logger = logging.getLogger(__name__)
+
 
 class ChatCRUD:
     """
@@ -42,18 +43,22 @@ class ChatCRUD:
     def session(self) -> AsyncSession:
         """Provides access to the database session."""
         return self._db
-    
+
     async def get_thread_by_id(self, thread_id: uuid.UUID) -> Optional[ThreadModel]:
         """Get a thread by ID."""
         if not thread_id:
             return None
-        statement = select(ThreadModel).where(ThreadModel.id == thread_id) # Sửa: ThreadModel.id thay vì ThreadModel.thread_id
+        statement = select(ThreadModel).where(
+            ThreadModel.id == thread_id
+        )  # Sửa: ThreadModel.id thay vì ThreadModel.thread_id
         result = await self.session.execute(statement)
         return result.scalars().first()
-    
-    async def create_thread(self, user_id: uuid.UUID | None, title: Optional[str] = "New Thread") -> ThreadModel:
+
+    async def create_thread(
+        self, user_id: uuid.UUID | None, title: Optional[str] = 'New Thread'
+    ) -> ThreadModel:
         """Create new thread."""
-        effective_title = title if title and title.strip() else "New Thread"
+        effective_title = title if title and title.strip() else 'New Thread'
 
         thread = ThreadModel(
             title=effective_title,
@@ -62,9 +67,9 @@ class ChatCRUD:
             last_message_at=utc_now(),  # Set to None initially
         )
         self.session.add(thread)
-        await self.session.flush() # use flush to get the ID before commit
+        await self.session.flush()  # use flush to get the ID before commit
         await self.session.refresh(thread)
-        logger.info(f"Thread created with ID: {thread.id} for user_id: {user_id}")
+        logger.info(f'Thread created with ID: {thread.id} for user_id: {user_id}')
         return thread
 
     async def save_message(
@@ -77,23 +82,25 @@ class ChatCRUD:
     ) -> MessageModel:
         """Save a message (Human or AI) to the database."""
         if not thread_id:
-            logger.error("Attempted to save message with no thread_id.")
-            raise ValueError("thread_id is required to save a message.")
+            logger.error('Attempted to save message with no thread_id.')
+            raise ValueError('thread_id is required to save a message.')
 
         message = MessageModel(
             content=content,
             thread_id=thread_id,
             message_id=message_id,
             role=role,
-            format="text",  
-            msg_metadata=ContentMetadata(custom=dict())
+            format='text',
+            msg_metadata=ContentMetadata(custom=dict()),
         )
         self.session.add(message)
-        await self.session.flush() 
+        await self.session.flush()
         await self.session.refresh(message)
-        logger.info(f"Message saved: ID {message.id}, message_id {message_id}, role {role.value}, thread_id {thread_id}")
+        logger.info(
+            f'Message saved: ID {message.id}, message_id {message_id}, role {role.value}, thread_id {thread_id}'
+        )
         return message
-    
+
     async def save_message_and_commit(
         self,
         content: str,
@@ -106,73 +113,90 @@ class ChatCRUD:
         Save a message (Human or AI) to the database and commit the session.
         This method is used for synchronous operations where the session should be committed immediately.
         """
-        
+
         if not thread_id:
-            logger.error("Attempted to save message with no thread_id.")
-            raise ValueError("thread_id is required to save a message.")
+            logger.error('Attempted to save message with no thread_id.')
+            raise ValueError('thread_id is required to save a message.')
 
         message = MessageModel(
             content=content,
             thread_id=thread_id,
             message_id=message_id,
             role=role,
-            format="text",  
+            format='text',
             msg_metadata=ContentMetadata(custom=dict()),
         )
         self.session.add(message)
         await self.session.commit()
         await self.session.refresh(message)
-        logger.info(f"Message saved and committed: ID {message.id}, message_id {message_id}, role {role.value}, thread_id {thread_id}")
+        logger.info(
+            f'Message saved and committed: ID {message.id}, message_id {message_id}, role {role.value}, thread_id {thread_id}'
+        )
         return message
-    
+
     async def save_assistant_message(
         self,
         content: str,
-        thread_id: str, # Nhận thread_id dạng string từ background task
+        thread_id: str,  # Nhận thread_id dạng string từ background task
         ai_message_id: str,
     ) -> MessageModel:
         """
-        Lưu tin nhắn của trợ lý (AI). 
+        Lưu tin nhắn của trợ lý (AI).
         Hàm này sẽ commit và đóng session vì nó được chạy trong background task.
         """
         assistant_message_obj: Optional[MessageModel] = None
         try:
             uuid_thread_id = uuid.UUID(thread_id)
-            
+
             assistant_message_obj = await self.save_message(
                 content=content,
                 thread_id=uuid_thread_id,
                 message_id=ai_message_id,
                 role=MessageRole.ASSISTANT,
             )
-            await self.session.commit() 
-            await self.session.refresh(assistant_message_obj) 
-            logger.info(f"Assistant message {assistant_message_obj.id} (message_id: {ai_message_id}) committed for thread_id: {thread_id}")
-            
+            await self.session.commit()
+            await self.session.refresh(assistant_message_obj)
+            logger.info(
+                f'Assistant message {assistant_message_obj.id} (message_id: {ai_message_id}) committed for thread_id: {thread_id}'
+            )
+
         except Exception as e:
-            logger.exception(f"Error during DB operations or commit for assistant message (thread_id {thread_id}, ai_message_id {ai_message_id}): {e}")
+            logger.exception(
+                f'Error during DB operations or commit for assistant message (thread_id {thread_id}, ai_message_id {ai_message_id}): {e}'
+            )
             if self.session.is_active:
                 try:
                     await self.session.rollback()
-                    logger.info(f"Session rolled back for assistant message due to error (thread_id {thread_id})")
+                    logger.info(
+                        f'Session rolled back for assistant message due to error (thread_id {thread_id})'
+                    )
                 except Exception as rb_exc:
-                    logger.exception(f"Error during rollback for assistant message (thread_id {thread_id}): {rb_exc}")
-            raise 
+                    logger.exception(
+                        f'Error during rollback for assistant message (thread_id {thread_id}): {rb_exc}'
+                    )
+            raise
         finally:
-            if self.session: 
+            if self.session:
                 try:
                     await self.session.close()
-                    logger.info(f"Session closed for assistant message task (thread_id {thread_id}, ai_message_id {ai_message_id})")
+                    logger.info(
+                        f'Session closed for assistant message task (thread_id {thread_id}, ai_message_id {ai_message_id})'
+                    )
                 except Exception as close_exc:
-                    logger.exception(f"Error closing session for assistant message task (thread_id {thread_id}): {close_exc}")
-        
+                    logger.exception(
+                        f'Error closing session for assistant message task (thread_id {thread_id}): {close_exc}'
+                    )
+
         if assistant_message_obj is None:
-           
-            logger.error(f"assistant_message_obj is None after try-finally block for thread_id {thread_id} (ai_message_id: {ai_message_id}). This is unexpected if no error was re-raised.")
-            raise Exception(f"Failed to save assistant message for thread_id {thread_id} due to an internal issue.")
-            
+            logger.error(
+                f'assistant_message_obj is None after try-finally block for thread_id {thread_id} (ai_message_id: {ai_message_id}). This is unexpected if no error was re-raised.'
+            )
+            raise Exception(
+                f'Failed to save assistant message for thread_id {thread_id} due to an internal issue.'
+            )
+
         return assistant_message_obj
-    
+
     async def save_human_message_and_ensure_thread(
         self,
         request_message: MessageRequest,
@@ -186,7 +210,7 @@ class ChatCRUD:
         Returns the message saved.
         """
         thread: Optional[ThreadModel] = None
-        
+
         final_thread_id: Optional[uuid.UUID] = None
 
         if request_message.message.thread_id:
@@ -200,43 +224,55 @@ class ChatCRUD:
                     #     thread = None # Coi như không tìm thấy thread hợp lệ
                     # else:
                     final_thread_id = thread.id
-                    logger.info(f"Using existing thread: {final_thread_id} for user_id: {user_id}")
+                    logger.info(
+                        f'Using existing thread: {final_thread_id} for user_id: {user_id}'
+                    )
                 else:
-                    logger.warning(f"Thread ID {request_message.message.thread_id} provided but not found. A new thread will be created.")
+                    logger.warning(
+                        f'Thread ID {request_message.message.thread_id} provided but not found. A new thread will be created.'
+                    )
             except ValueError:
-                logger.warning(f"Invalid thread_id format: {request_message.message.thread_id}. A new thread will be created.")
+                logger.warning(
+                    f'Invalid thread_id format: {request_message.message.thread_id}. A new thread will be created.'
+                )
 
-
-        if not thread: # Nếu không có thread_id hợp lệ hoặc thread không tìm thấy
+        if not thread:  # Nếu không có thread_id hợp lệ hoặc thread không tìm thấy
             # Tạo title cho thread mới từ message đầu tiên (nếu có)
             # Hoặc để title mặc định
-            new_thread_title = request_message.message.content[:50] + "..." if request_message.message else "New Thread"
+            new_thread_title = (
+                request_message.message.content[:50] + '...'
+                if request_message.message
+                else 'New Thread'
+            )
 
             thread = await self.create_thread(user_id=user_id, title=new_thread_title)
             final_thread_id = thread.id
-            logger.info(f"New thread created with ID: {final_thread_id} for user_id: {user_id}")
-
+            logger.info(
+                f'New thread created with ID: {final_thread_id} for user_id: {user_id}'
+            )
 
         if not final_thread_id:
-            logger.error("Failed to obtain a valid thread_id for saving human message.")
-            raise Exception("Internal server error: Could not determine thread for message.")
-
+            logger.error('Failed to obtain a valid thread_id for saving human message.')
+            raise Exception(
+                'Internal server error: Could not determine thread for message.'
+            )
 
         human_message = await self.save_message(
             content=request_message.message.content,
             thread_id=final_thread_id,
             message_id=human_message_id,
             role=MessageRole.USER,
-            message_metadata=None
+            message_metadata=None,
         )
 
         await self.session.commit()
-        logger.info(f"Human message {human_message.id} and thread operations committed for thread_id: {final_thread_id}")
-        
-        
+        logger.info(
+            f'Human message {human_message.id} and thread operations committed for thread_id: {final_thread_id}'
+        )
+
         await self.session.refresh(human_message)
-        if thread and thread in self.session: 
-             await self.session.refresh(thread)
+        if thread and thread in self.session:
+            await self.session.refresh(thread)
 
         return human_message
 
@@ -247,7 +283,7 @@ class ChatCRUD:
         statement = (
             select(MessageModel)
             .where(MessageModel.thread_id == thread_id)
-            .order_by(asc(MessageModel.created_at))  
+            .order_by(asc(MessageModel.created_at))
             .offset(offset)
             .limit(limit)
         )
@@ -268,10 +304,3 @@ class ChatCRUD:
         )
         result = await self.session.execute(statement)
         return list(result.scalars().all())
-        
-        
-    
-        
-        
-        
-        
