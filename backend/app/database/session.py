@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
 import orjson
-from sqlalchemy import QueuePool, text
+from sqlalchemy import AsyncAdaptedQueuePool, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config.settings import settings
@@ -36,7 +36,7 @@ async_engine = create_async_engine(
     max_overflow=10,
     pool_size=20,
     pool_timeout=30,
-    poolclass=QueuePool,
+    poolclass=AsyncAdaptedQueuePool,
     connect_args={
         'server_settings': {
             'jit': 'off',  # Tắt JIT cho performance ổn định
