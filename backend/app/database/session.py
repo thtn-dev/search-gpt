@@ -1,14 +1,13 @@
-# type: ignore
 """
 Database session management for async operations.
 """
 
+from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi.concurrency import asynccontextmanager
-from sqlalchemy import AsyncAdaptedQueuePool
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
+import orjson
+from sqlalchemy import QueuePool, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.config.settings import settings
 
@@ -19,6 +18,14 @@ ASYNC_DATABASE_URL = settings.DATABASE_URL.replace(
 )
 
 
+def json_serializer(obj):
+    return orjson.dumps(obj, default=str)
+
+
+def json_deserializer(obj):
+    return orjson.loads(obj)
+
+
 # Async engine and session
 async_engine = create_async_engine(
     ASYNC_DATABASE_URL,
@@ -26,26 +33,39 @@ async_engine = create_async_engine(
     future=True,
     pool_pre_ping=True,
     pool_recycle=3600,
-    poolclass=AsyncAdaptedQueuePool,
+    max_overflow=10,
+    pool_size=20,
+    pool_timeout=30,
+    poolclass=QueuePool,
     connect_args={
-        # "ssl": False,
+        'server_settings': {
+            'jit': 'off',  # Tắt JIT cho performance ổn định
+            'application_name': 'fastapi_ai_explorer',
+        },
+        'command_timeout': 60,  # Timeout cho commands
+        'ssl': 'prefer',  # SSL settings
     },
+    json_serializer=json_serializer,
+    json_deserializer=json_deserializer,
 )
 
-AsyncSessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
+# Use async_sessionmaker instead of sessionmaker for async sessions
+AsyncSessionLocal = async_sessionmaker(
     bind=async_engine,
     class_=AsyncSession,
+    autoflush=False,
     expire_on_commit=False,
 )
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-    """Dependency to get an AsyncSession."""
+    """Dependency to get an AsyncSession for FastAPI."""
     async with AsyncSessionLocal() as session:
         try:
             yield session
+        except Exception:
+            await session.rollback()
+            raise
         finally:
             await session.close()
 
@@ -53,12 +73,35 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 @asynccontextmanager
 async def get_async_ctx_session() -> AsyncGenerator[AsyncSession, None]:
     """Context manager to get an AsyncSession."""
-    async_session = AsyncSessionLocal()
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+
+
+# Alternative: Manual session management (if needed)
+async def create_async_session() -> AsyncSession:
+    """Create a new AsyncSession manually."""
+    return AsyncSessionLocal()
+
+
+# For dependency injection in FastAPI
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """FastAPI dependency for database session."""
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise
+
+
+async def check_db_health():
     try:
-        yield async_session
-        # Không commit ở đây, để logic nghiệp vụ tự commit
+        async with async_engine.begin() as conn:
+            result = await conn.execute(text('SELECT 1'))
+            return result.scalar() == 1
     except Exception:
-        await async_session.rollback()
-        raise
-    finally:
-        await async_session.close()
+        return False

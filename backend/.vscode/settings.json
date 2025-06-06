@@ -2,5 +2,59 @@
     "files.exclude": {
         "**/__pycache__": true,
         "**/*.pyc": true
+    },
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoFormatStrings": true,
+    "python.analysis.completeFunctionParens": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
+    "python.analysis.inlayHints.pytestParameters": true,
+    "python.analysis.extraPaths": [
+        "./app",
+        "./src"
+    ],
+    "python.analysis.stubPath": "./typings",
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "sklearn",
+            "depth": 2
+        },
+        {
+            "name": "matplotlib",
+            "depth": 2
+        },
+        {
+            "name": "scipy",
+            "depth": 2
+        },
+        {
+            "name": "django",
+            "depth": 2
+        },
+        {
+            "name": "flask",
+            "depth": 2
+        },
+        {
+            "name": "fastapi",
+            "depth": 2
+        },
+        {
+            "name": "cuda",
+            "depth": 3,
+            "includeAllSymbols": true
+        }
+    ],
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.envFile": "${workspaceFolder}/.env",
+    // FastAPI dev server
+    "python.terminal.activateEnvironment": true,
+    // Auto-reload khi save
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/__pycache__/**": true
     }
 }

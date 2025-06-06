@@ -165,12 +165,12 @@ class SearxngClient:
             logger.error(f'Network error during search: {str(e)}')
             raise HTTPException(
                 status_code=502, detail='Failed to connect to search service'
-            )
+            ) from e
         except Exception as e:
             logger.error(f'Unexpected error during search: {str(e)}')
             raise HTTPException(
                 status_code=500, detail='Internal server error during search'
-            )
+            ) from e
 
 
 # Singleton instance for reuse across FastAPI app
