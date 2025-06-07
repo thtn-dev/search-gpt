@@ -10,10 +10,10 @@
     "python.analysis.inlayHints.functionReturnTypes": true,
     "python.analysis.inlayHints.variableTypes": true,
     "python.analysis.inlayHints.pytestParameters": true,
-    "python.analysis.extraPaths": [
-        "./app",
-        "./src"
-    ],
+    // "python.analysis.extraPaths": [
+    //     "./app",
+    //     "./src"
+    // ],
     "python.analysis.stubPath": "./typings",
     "python.analysis.packageIndexDepths": [
         {

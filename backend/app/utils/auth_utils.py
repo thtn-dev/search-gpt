@@ -13,7 +13,7 @@ from fastapi import HTTPException, status
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 
-from app.config.settings import settings
+from app.config.appsettings import get_settings
 from app.schemas.auth_schemas import (
     AuthProvider,
     NextAuthSigninPayload,
@@ -27,7 +27,7 @@ async def verify_google_id_token(google_token: str) -> VerifiedUserData:
     """Verifies a Google ID token and returns standardized user data."""
     try:
         idinfo = id_token.verify_oauth2_token(
-            google_token, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            google_token, google_requests.Request(), get_settings().auth.google_client_id
         )
         return VerifiedUserData(
             provider=AuthProvider.GOOGLE,
@@ -318,7 +318,7 @@ async def verify_microsoft_id_token(ms_token: str) -> VerifiedUserData:
         )  # alg from header not directly used after this
 
         public_key_obj, expected_issuer = await get_microsoft_public_key(
-            kid, settings.MICROSOFT_TENANT_ID
+            kid, get_settings().auth.microsoft_tenant_id
         )
 
         logger.debug(
@@ -330,18 +330,18 @@ async def verify_microsoft_id_token(ms_token: str) -> VerifiedUserData:
             ms_token,
             key=public_key_obj,
             algorithms=['RS256'],
-            audience=settings.MICROSOFT_CLIENT_ID,
+            audience=get_settings().auth.microsoft_client_id,
             issuer=expected_issuer,
         )
 
         if (
-            settings.MICROSOFT_TENANT_ID != 'common'
-            and payload.get('tid') != settings.MICROSOFT_TENANT_ID
+            get_settings().auth.microsoft_tenant_id != 'common'
+            and payload.get('tid') != get_settings().auth.microsoft_tenant_id
         ):
             logger.warning(
                 'Tenant ID mismatch for kid %s. Expected %s, got %s',
                 kid,
-                settings.MICROSOFT_TENANT_ID,
+                get_settings().auth.microsoft_tenant_id,
                 payload.get('tid'),
             )
             raise ValueError('Incorrect tenant ID in token')

@@ -1,3 +1,4 @@
 # Python
 .venv/
 .logs/
+backend/appsettings.toml

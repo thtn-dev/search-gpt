@@ -314,13 +314,13 @@ async def chat_stream_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f'Invalid data for message saving: {ve}',
-        )
+        ) from ve
     except Exception as e:
         logger.exception(f'Failed to save human message or ensure thread: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Could not process message saving.',
-        )
+        ) from e
 
     return StreamingResponse(
         _generate_llm_stream_and_log(
@@ -435,7 +435,7 @@ async def get_threads_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Could not retrieve threads.',
-        )
+        ) from e
 
 
 @router.post('/threads', status_code=status.HTTP_201_CREATED)
@@ -460,7 +460,7 @@ async def create_thread_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Could not create thread.',
-        )
+        ) from e
 
 
 @router.post('/threads/{thread_id}/messages', status_code=status.HTTP_201_CREATED)
@@ -496,13 +496,13 @@ async def add_message_to_thread_endpoint(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f'Invalid data for message saving: {ve}',
-        )
+        ) from ve
     except Exception as e:
         logger.error(f'Error adding message to thread {thread_id}: {e}')
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Could not add message to thread.',
-        )
+        ) from e
 
 
 @router.get('/threads/{thread_id}/messages', status_code=status.HTTP_200_OK)
@@ -535,4 +535,4 @@ async def get_thread_messages_endpoint(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail='Could not retrieve messages.',
-        )
+        ) from e

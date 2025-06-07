@@ -1,0 +1,24 @@
+[app]
+name = "My FastAPI App"
+version = "1.0.0"
+debug = true
+
+[database]
+default_connection = ""
+
+[llmmodel.gemini]
+api_key = ""
+
+[llmmodel.openai]
+api_key = ""
+
+[api_endpoints]
+searxng = ""
+
+[auth]
+access_token_exp = 1440
+refresh_token_exp = 10080
+encrypt_key = ""
+goolge_client_id= ""
+microsoft_client_id = ""
+microsoft_tenant_id = ""

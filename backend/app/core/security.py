@@ -6,10 +6,10 @@ import bcrypt
 import jwt
 from cryptography.fernet import Fernet
 
-from app.config.settings import settings
+from app.config.appsettings import get_settings
 from app.utils.datetime_utils import utc_now
 
-fernet = Fernet(str.encode(settings.ENCRYPT_KEY))
+fernet = Fernet(str.encode(get_settings().auth.encrypt_key))
 JWT_ALGORITHM = 'HS256'
 
 
@@ -22,7 +22,7 @@ def create_access_token(
         expire = utc_now() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+            minutes=get_settings().auth.access_token_exp
         )
 
     jti = uuid.uuid4()
@@ -43,7 +43,7 @@ def create_access_token(
 
     return jwt.encode(
         payload=to_encode,
-        key=settings.ENCRYPT_KEY,
+        key=get_settings().auth.encrypt_key,
         algorithm=JWT_ALGORITHM,
     )
 
@@ -54,12 +54,12 @@ def create_refresh_token(
     if expires_delta:
         expire = utc_now() + expires_delta
     else:
-        expire = utc_now() + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
+        expire = utc_now() + timedelta(minutes=get_settings().auth.refresh_token_exp)
     to_encode = {'exp': expire, 'sub': str(subject), 'type': 'refresh'}
 
     return jwt.encode(
         payload=to_encode,
-        key=settings.ENCRYPT_KEY,
+        key=get_settings().auth.encrypt_key,
         algorithm=JWT_ALGORITHM,
     )
 
@@ -67,7 +67,7 @@ def create_refresh_token(
 def decode_token(token: str) -> dict[str, Any]:
     return jwt.decode(
         jwt=token,
-        key=settings.ENCRYPT_KEY,
+        key=get_settings().auth.encrypt_key,
         algorithms=[JWT_ALGORITHM],
     )
 

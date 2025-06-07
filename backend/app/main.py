@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router_v1
+from app.config.appsettings import app_settings
 from app.config.logging_config import setup_logging
 
 setup_logging()
@@ -40,6 +41,14 @@ def create_application() -> FastAPI:
     async def root() -> dict:
         """Root endpoint"""
         return {'message': 'Welcome to the Gemini Chat API!'}
+
+    @application.get('/config')
+    async def read_config(settings: app_settings):
+        logger.warning(settings)
+        return {
+            'app_name': settings.app.name,
+            'database_host': settings.database.host,
+        }
 
     # Include API router
     application.include_router(api_router_v1, prefix='/v1')

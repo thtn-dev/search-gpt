@@ -15,7 +15,6 @@ from sqlmodel import (
     SQLModel,
     UniqueConstraint,
 )
-
 from app.utils.datetime_utils import utc_now
 
 
@@ -49,7 +48,7 @@ class UserModel(UserBase, table=True):
 
     linked_accounts: Mapped[List['LinkedAccountModel']] = Relationship(
         back_populates='user',
-        sa_relationship_kwargs={'cascade': 'all, delete-orphan', 'lazy': 'selectin'},
+        sa_relationship_kwargs={'cascade': 'all, delete-orphan', 'lazy': 'noload'},
     )
 
 

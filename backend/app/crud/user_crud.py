@@ -10,14 +10,12 @@ import logging
 import uuid
 from typing import Optional  # Removed Any, Dict as they were unused
 
-from fastapi import Depends
 from pydantic import EmailStr  # Part of Pydantic, typically considered third-party
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
-from app.database.session import get_async_session
+from app.database.session import AsyncDbSession, SqlaAsyncSession
 from app.models.user_model import LinkedAccountModel, UserModel
 from app.schemas.auth_schemas import AuthProvider, VerifiedUserData
 
@@ -30,7 +28,7 @@ class UserCRUD:
     The database session is injected into the constructor.
     """
 
-    def __init__(self, db: AsyncSession = Depends(get_async_session)):
+    def __init__(self, db: AsyncDbSession):
         """
         Initializes the CRUD class with a database session.
 
@@ -43,7 +41,7 @@ class UserCRUD:
         self._db = db
 
     @property
-    def session(self) -> AsyncSession:
+    def session(self) -> SqlaAsyncSession:
         """Provides access to the database session."""
         return self._db
 
@@ -104,8 +102,8 @@ class UserCRUD:
         )
 
         has_link = any(
-            la.provider == provider.value and la.provider_key == provider_key
-            for la in user.linked_accounts
+            linked_account.provider == provider.value and linked_account.provider_key == provider_key
+            for linked_account in user.linked_accounts
         )
         if has_link:
             logger.info(
@@ -115,9 +113,9 @@ class UserCRUD:
             )
             existing_link = next(
                 (
-                    la
-                    for la in user.linked_accounts
-                    if la.provider == provider.value and la.provider_key == provider_key
+                    linked_account
+                    for linked_account in user.linked_accounts
+                    if linked_account.provider == provider.value and linked_account.provider_key == provider_key
                 ),
                 None,
             )

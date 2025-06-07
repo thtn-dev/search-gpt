@@ -7,11 +7,9 @@ import logging
 import uuid
 from typing import Optional
 
-from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import asc, desc, select
 
-from app.database.session import get_async_session
+from app.database.session import AsyncDbSession, SqlaAsyncSession
 from app.models.message_model import MessageModel, MessageRole
 from app.models.thread_model import ThreadModel
 from app.schemas.message_schema import MessageRequest
@@ -27,7 +25,7 @@ class ChatCRUD:
     This class provides methods to create, read, update, and delete chat messages.
     """
 
-    def __init__(self, db: AsyncSession = Depends(get_async_session)):
+    def __init__(self, db: AsyncDbSession):
         """
         Initializes the CRUD class with a database session.
 
@@ -40,7 +38,7 @@ class ChatCRUD:
         self._db = db
 
     @property
-    def session(self) -> AsyncSession:
+    def session(self) -> SqlaAsyncSession:
         """Provides access to the database session."""
         return self._db
 
@@ -91,7 +89,7 @@ class ChatCRUD:
             message_id=message_id,
             role=role,
             format='text',
-            msg_metadata=ContentMetadata(custom=dict()),
+            msg_metadata=ContentMetadata(custom={}),
         )
         self.session.add(message)
         await self.session.flush()
@@ -124,7 +122,7 @@ class ChatCRUD:
             message_id=message_id,
             role=role,
             format='text',
-            msg_metadata=ContentMetadata(custom=dict()),
+            msg_metadata=ContentMetadata(custom={}),
         )
         self.session.add(message)
         await self.session.commit()

@@ -1,19 +1,20 @@
 """
 Database session management for async operations.
 """
-
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Annotated, AsyncGenerator
 
 import orjson
+from fastapi import Depends
 from sqlalchemy import AsyncAdaptedQueuePool, text
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession as SqlaAsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.config.settings import settings
+from app.config.appsettings import get_settings
 
 # Database URLs
-DATABASE_URL = settings.DATABASE_URL
-ASYNC_DATABASE_URL = settings.DATABASE_URL.replace(
+DATABASE_URL = get_settings().database.default_connection
+ASYNC_DATABASE_URL = DATABASE_URL.replace(
     'postgresql://', 'postgresql+asyncpg://'
 )
 
@@ -52,13 +53,12 @@ async_engine = create_async_engine(
 # Use async_sessionmaker instead of sessionmaker for async sessions
 AsyncSessionLocal = async_sessionmaker(
     bind=async_engine,
-    class_=AsyncSession,
+    class_=SqlaAsyncSession,
     autoflush=False,
     expire_on_commit=False,
 )
 
-
-async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_session() -> AsyncGenerator[SqlaAsyncSession, None]:
     """Dependency to get an AsyncSession for FastAPI."""
     async with AsyncSessionLocal() as session:
         try:
@@ -69,9 +69,8 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
-
 @asynccontextmanager
-async def get_async_ctx_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_ctx_session() -> AsyncGenerator[SqlaAsyncSession, None]:
     """Context manager to get an AsyncSession."""
     async with AsyncSessionLocal() as session:
         try:
@@ -82,13 +81,13 @@ async def get_async_ctx_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 # Alternative: Manual session management (if needed)
-async def create_async_session() -> AsyncSession:
+async def create_async_session() -> SqlaAsyncSession:
     """Create a new AsyncSession manually."""
     return AsyncSessionLocal()
 
 
 # For dependency injection in FastAPI
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_db() -> AsyncGenerator[SqlaAsyncSession, None]:
     """FastAPI dependency for database session."""
     async with AsyncSessionLocal() as session:
         try:
@@ -105,3 +104,5 @@ async def check_db_health():
             return result.scalar() == 1
     except Exception:
         return False
+
+AsyncDbSession = Annotated[SqlaAsyncSession, Depends(get_db)]
