@@ -1,3 +1,5 @@
+'use client';
+
 import { Message, Thread } from '@/schemas/chat-schema';
 import crypto from 'crypto';
 import { create } from 'zustand';
@@ -8,7 +10,8 @@ import {
   fetchThreads,
   fetchMessages,
   createMessage,
-  streamChatResponse
+  streamChatResponse,
+  getThreadById
 } from './api-service';
 import { processStreamingResponse } from './streaming-service';
 import { CreateMessageRequest } from './types';
@@ -37,6 +40,7 @@ interface ChatState {
   switchThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => void;
   updateThreadTitle: (threadId: string, title: string) => void;
+  loadThreadById: (threadId: string) => Promise<void>;
 
   // Message actions
   loadMessages: (threadId: string) => Promise<void>;
@@ -52,6 +56,8 @@ interface ChatState {
     isStreaming?: boolean
   ) => void;
   clearMessages: (threadId: string) => void;
+
+  emptyThread: () => void;
 }
 
 // Helper functions
@@ -60,8 +66,6 @@ function genMessageId(): string {
   const hexPart = crypto.randomBytes(8).toString('hex');
   return `${timestamp.toString(16)}-${hexPart}`;
 }
-
-const FAKE_PARENT_ID = '00000000-0000-0000-0000-000000000000';
 
 // Zustand store
 export const useChatStore = create<ChatState>()(
@@ -86,11 +90,17 @@ export const useChatStore = create<ChatState>()(
 
         // Thread actions
         createThread: async (title?: string) => {
-          const threadTitle = title || `Chat ${new Date().toLocaleString()}`;
+          let threadTitle = title ?? `Chat ${new Date().toLocaleString()}`;
+
+          // truncate title to 50 characters
+          if (threadTitle.length > 50) {
+            threadTitle = threadTitle.slice(0, 47) + '...';
+          }
+
           set({ isLoading: true });
 
           try {
-            const data = await createThreadAsync();
+            const data = await createThreadAsync(threadTitle);
             const newThread: Thread = {
               id: data.thread_id,
               title: threadTitle,
@@ -134,21 +144,38 @@ export const useChatStore = create<ChatState>()(
           }
         },
 
+        loadThreadById: async (threadId: string) => {
+          set({ isLoadingThreads: true });
+
+          try {
+            const thread = await getThreadById(threadId);
+            if (!thread) {
+              throw new Error(`Thread with ID ${threadId} not found`);
+            }
+            set({
+              currentThreadId: threadId,
+              currentThread: thread,
+              isLoadingThreads: false
+            });
+          } catch (error) {
+            console.error('Load thread by ID error:', error);
+            const errorMessage =
+              error instanceof Error ? error.message : 'Failed to load thread';
+            set({ error: errorMessage, isLoadingThreads: false });
+          }
+        },
+
         switchThread: async (threadId: string) => {
           const currentThreadId = get().currentThreadId;
           if (currentThreadId === threadId) {
-            console.log("no no no");
             return; // Không cần load lại nếu đã là thread hiện tại
           }
-          console.log("select fuck");
           const threads = get().threads;
           const thread = threads.find((t) => t.id === threadId);
           if (!thread) {
             console.error(`Thread with ID ${threadId} not found`);
             return;
           }
-          console.log("select fuck");
-
           set({ currentThreadId: threadId, currentThread: thread });
 
           await get().loadMessages(threadId);
@@ -187,7 +214,6 @@ export const useChatStore = create<ChatState>()(
         // Message actions
         loadMessages: async (threadId: string) => {
           set({ isLoadingMessages: true });
-
           try {
             const messages = await fetchMessages(threadId);
             set({ messages, isLoadingMessages: false });
@@ -232,7 +258,7 @@ export const useChatStore = create<ChatState>()(
               content,
               createdAt: new Date(),
               threadId: targetThreadId,
-              parentId: FAKE_PARENT_ID
+              parentId: undefined
             };
 
             get().addMessage(userMessage);
@@ -331,6 +357,9 @@ export const useChatStore = create<ChatState>()(
             if (message) {
               message.content = content;
               message.isStreaming = isStreaming;
+              if (isStreaming !== undefined) {
+                draft.isLoading = isStreaming;
+              }
             }
           });
         },
@@ -348,6 +377,12 @@ export const useChatStore = create<ChatState>()(
             }
           });
         },
+        emptyThread: () =>
+          set((draft) => {
+            draft.messages = [];
+            draft.currentThreadId = null;
+            draft.currentThread = null;
+          })
       }))
     ),
     { name: 'ChatStore' }

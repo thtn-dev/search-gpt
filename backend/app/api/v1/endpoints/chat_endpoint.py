@@ -505,6 +505,42 @@ async def add_message_to_thread_endpoint(
         ) from e
 
 
+@router.get('/threads/{thread_id}', status_code=status.HTTP_200_OK)
+async def get_thread_endpoint(
+    thread_id: str,
+    crud: ChatCRUD = Depends(ChatCRUD),
+    current_user: UserLoggedIn = Depends(get_current_user),
+):
+    """
+    Lấy thông tin của một thread cụ thể.
+    """
+    try:
+        thread_uuid_valid = is_valid_uuid(thread_id)
+
+        if not thread_uuid_valid:
+            logger.error(f'Invalid thread_id format: {thread_id}')
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail='Invalid thread ID format.',
+            )
+
+        thread_uuid = uuid.UUID(thread_id)
+
+        thread = await crud.get_thread_by_id(thread_id=thread_uuid)
+        if not thread:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail='Thread not found.',
+            )
+        return thread
+    except Exception as e:
+        logger.error(f'Error retrieving thread {thread_id}: {e}')
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail='Could not retrieve thread.',
+        ) from e
+
+
 @router.get('/threads/{thread_id}/messages', status_code=status.HTTP_200_OK)
 async def get_thread_messages_endpoint(
     thread_id: str,

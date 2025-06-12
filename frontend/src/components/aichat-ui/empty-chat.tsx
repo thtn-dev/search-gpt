@@ -1,18 +1,18 @@
 'use client';
 
 import React, { Fragment } from 'react';
+import { useShallow } from 'zustand/shallow';
 import { AuroraText } from '../magicui/aurora-text';
 import { MessageInput } from './message-input';
 import { useChatStore } from './store/chat-store';
-import {useShallow} from 'zustand/shallow';
 
 export default function EmptyChat() {
-  const { sendMessage, createThread } = useChatStore(useShallow((state) => ({
-    sendMessage: state.sendMessage,
-    createThread: state.createThread,
-  })));
-
- 
+  const { sendMessage, createThread } = useChatStore(
+    useShallow((state) => ({
+      sendMessage: state.sendMessage,
+      createThread: state.createThread
+    }))
+  );
 
   const changeUrlOnly = React.useCallback((tId: string) => {
     window.history.pushState({ threadId: tId }, '', `/threads/${tId}`);
@@ -21,7 +21,7 @@ export default function EmptyChat() {
   const handleSendFirstMessage = React.useCallback(
     async (message: string, files: File[]) => {
       // Create a new thread if it doesn't exist
-      const tId = await createThread('New Thread');
+      const tId = await createThread(message);
       if (!tId) {
         console.error('Failed to create thread');
         return;

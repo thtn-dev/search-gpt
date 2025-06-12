@@ -1,3 +1,4 @@
+'use client';
 // Optional: Export type definitions for better TypeScript support
 export interface StreamData {
   metadata?: MessageStreamMetadata;

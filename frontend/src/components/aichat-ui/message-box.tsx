@@ -1,3 +1,5 @@
+'use client';
+
 import React, { Fragment } from 'react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/schemas/chat-schema';

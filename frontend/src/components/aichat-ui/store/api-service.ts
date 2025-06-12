@@ -1,3 +1,5 @@
+'use client';
+
 import { Thread, Message } from '@/schemas/chat-schema';
 import { getSession } from 'next-auth/react';
 import {
@@ -40,7 +42,9 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
   return response;
 };
 
-export const createThreadAsync = async (): Promise<{ thread_id: string }> => {
+export const createThreadAsync = async (
+  title: string
+): Promise<{ thread_id: string }> => {
   const session = await getSession();
   console.log(session);
   const response = await fetch(`${API_BASE_URL}/v1/threads`, {
@@ -50,7 +54,7 @@ export const createThreadAsync = async (): Promise<{ thread_id: string }> => {
       Authorization: `Bearer ${session?.user?.accessToken}`
     },
     body: JSON.stringify({
-      title: `Chat ${new Date().toLocaleString()}`
+      title
     })
   });
 
@@ -110,6 +114,30 @@ export const createMessage = async (
     body: JSON.stringify(messageRequest)
   });
   return response.json();
+};
+
+export const getThreadById = async (
+  threadId: string
+): Promise<Thread | null> => {
+  const session = await getSession();
+  const response = await apiRequest(`/v1/threads/${threadId}`, {
+    headers: {
+      Authorization: `Bearer ${session?.user?.accessToken}`
+    }
+  });
+  if (!response.ok) {
+    if (response.status === 404) {
+      return null; // Thread not found
+    }
+    throw new Error(`Failed to fetch thread: ${response.status}`);
+  }
+  const data = (await response.json()) as ThreadResponse;
+  return {
+    id: data.id,
+    title: data.title,
+    createdAt: new Date(data.created_at),
+    updatedAt: new Date(data.updated_at)
+  };
 };
 
 export const streamChatResponse = async (

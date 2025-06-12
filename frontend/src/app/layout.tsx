@@ -29,6 +29,7 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body
         className={`${InterFont.className} ${JetBrainsMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
           <AuthProvider>{children}</AuthProvider>
