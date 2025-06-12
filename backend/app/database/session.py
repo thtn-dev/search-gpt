@@ -20,7 +20,7 @@ ASYNC_DATABASE_URL = DATABASE_URL.replace(
 
 
 def json_serializer(obj):
-    return orjson.dumps(obj, default=str)
+    return orjson.dumps(obj, default=str).decode("utf-8")
 
 
 def json_deserializer(obj):

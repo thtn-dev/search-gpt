@@ -5,23 +5,32 @@ import { useParams } from 'next/navigation';
 import { ScrollArea } from '../ui/scroll-area';
 import { SidebarInset, SidebarProvider } from '../ui/sidebar';
 import Chat from './chat';
-import { useChatContext, useCurrentThread } from './context';
 import EmptyChat from './empty-chat';
 import { MessageInput } from './message-input';
 import { AppSidebar } from './sidebar/app-sidebar';
 import ThreadHeader from './thread-header';
+import { useChatStore } from './store/chat-store';
 
 export function ThreadRoot() {
   const params = useParams();
   const threadId = (params.id as string) || null;
-  const { sendMessage, switchThread } = useChatContext();
-  const thread = useCurrentThread();
+  const sendMessage = useChatStore(state => state.sendMessage);
+  const switchThread = useChatStore(state => state.switchThread);
+  const thread = useChatStore(state => state.currentThread);
+  const loadThreads = useChatStore(state => state.loadThreads);
+
+   React.useEffect(() => {
+    loadThreads();
+  }, [loadThreads]);
 
   React.useEffect(() => {
     if (threadId) {
+      console.log("switching thread to:", threadId);
       switchThread(threadId);
     }
   }, [threadId, switchThread]);
+
+  
 
   return (
     <SidebarProvider>

@@ -3,8 +3,8 @@
 import React, { Fragment } from 'react';
 import { Message } from '@/schemas/chat-schema';
 import { Avatar, AvatarFallback } from '../ui/avatar';
-import { useChatContext, useCurrentMessages } from './context';
 import MessageBox from './message-box';
+import { useChatStore } from './store/chat-store';
 
 const UserMessageBox = ({
   message,
@@ -28,9 +28,9 @@ const UserMessageBox = ({
 };
 
 export default function Chat() {
-  const { state } = useChatContext();
-  const currrentMessages = useCurrentMessages();
-
+  const isLoading = useChatStore((state) => state.isLoading);
+  const currrentMessages = useChatStore((state) => state.messages);
+  console.log(currrentMessages);
   return (
     <Fragment>
       {currrentMessages.map((message, index) => (
@@ -41,7 +41,7 @@ export default function Chat() {
             <MessageBox
               messsage={message}
               messageIndex={index}
-              loading={state.isLoading && index === currrentMessages.length - 1}
+              loading={isLoading && index === currrentMessages.length - 1}
               isLastMessage={index === currrentMessages.length - 1}
             />
           )}

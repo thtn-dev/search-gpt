@@ -2,15 +2,17 @@
 
 import React, { Fragment } from 'react';
 import { AuroraText } from '../magicui/aurora-text';
-import { useChatContext } from './context';
 import { MessageInput } from './message-input';
+import { useChatStore } from './store/chat-store';
+import {useShallow} from 'zustand/shallow';
 
 export default function EmptyChat() {
-  const { sendMessage, createThread, loadThreads } = useChatContext();
+  const { sendMessage, createThread } = useChatStore(useShallow((state) => ({
+    sendMessage: state.sendMessage,
+    createThread: state.createThread,
+  })));
 
-  React.useEffect(() => {
-    loadThreads();
-  }, [loadThreads]);
+ 
 
   const changeUrlOnly = React.useCallback((tId: string) => {
     window.history.pushState({ threadId: tId }, '', `/threads/${tId}`);

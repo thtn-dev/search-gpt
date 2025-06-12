@@ -2,10 +2,10 @@ import React from 'react';
 import ThemeSwitcher from '../theme-switcher';
 import { Separator } from '../ui/separator';
 import { SidebarTrigger } from '../ui/sidebar';
-import { useCurrentThread } from './context';
+import { useChatStore } from './store/chat-store';
 
 export default function ThreadHeader() {
-  const thread = useCurrentThread();
+   const thread = useChatStore(state => state.currentThread);
   return (
     <header className='flex h-12 sticky shrink-0 items-center gap-2 transition-[width,height] ease-linear shadow-sm'>
       <div className='flex items-center justify-between gap-2 px-4 w-full'>

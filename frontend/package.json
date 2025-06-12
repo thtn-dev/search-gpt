@@ -31,6 +31,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
+    "immer": "^10.1.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.477.0",
     "markdown-to-jsx": "^7.7.6",
@@ -46,7 +47,8 @@
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.0.2",
-    "zod": "^3.24.3"
+    "zod": "^3.24.3",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

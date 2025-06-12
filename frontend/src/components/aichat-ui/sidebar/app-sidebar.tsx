@@ -8,11 +8,11 @@ import {
   SidebarHeader,
   SidebarRail
 } from '@/components/ui/sidebar';
-import { useChatContext } from '../context';
+import { useChatStore } from '../store/chat-store';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { state, switchThread } = useChatContext();
-  const { threads } = state;
+  const threads = useChatStore(state => state.threads);
+  const switchThread= useChatStore(state => state.switchThread);
   const changeUrlOnly = React.useCallback((tId: string) => {
     window.history.pushState({ threadId: tId }, '', `/threads/${tId}`);
   }, []);

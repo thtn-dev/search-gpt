@@ -3,7 +3,7 @@ from typing import Dict, List
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, SecretStr
 
-from app.config import settings
+from app.config.appsettings import get_settings
 from app.library.providers.core import ChatModel
 
 
@@ -30,7 +30,7 @@ def load_openai_chat_models() -> Dict[str, ChatModel]:
     """
     Load OpenAI chat models from the predefined list.
     """
-    openaiApiKey = settings.settings.OPENAI_API_KEY
+    openaiApiKey = get_settings().llmmodel.openai.api_key
 
     if not openaiApiKey:
         raise ValueError('OpenAI API key is not set.')

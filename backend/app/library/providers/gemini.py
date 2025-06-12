@@ -8,7 +8,7 @@ from langchain_google_genai import (
 )
 from pydantic import BaseModel
 
-from app.config import settings
+from app.config.appsettings import get_settings
 from app.library.providers.core import ChatModel
 
 
@@ -52,7 +52,7 @@ def load_gemini_chat_models() -> Dict[str, ChatModel]:
     """
     Load Gemini chat models from the predefined list.
     """
-    geminiApiKey = settings.settings.GOOGLE_API_KEY
+    geminiApiKey = get_settings().llmmodel.gemini.api_key
 
     if not geminiApiKey:
         raise ValueError('Gemini API key is not set.')
